@@ -214,9 +214,15 @@ input[type="search"]:hover {
     }
 }
 
+table {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
 tr {
     height: 40px;
     border-bottom: 1px solid #ddd;
+    margin: 10px;
 }
 
 th {
@@ -226,5 +232,5 @@ th {
 td {
     padding: 10px;
     background-color: white;
-    color: black
+    color: black;
 }
