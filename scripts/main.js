@@ -257,8 +257,113 @@ function startSimulation() {
         alert('Please add at least 3 castmates to start the simulation.');
         return;
     }
+
+    startEntranceSequence();
+}
+
+// UI Class //
+// UI Class //
+class UI {
+    constructor() {
+        this.container = document.getElementById('container');
+    }
+
+    wipe() {
+        this.container.innerHTML = '';
+    }
+
+    addImage(src, alt = '', style = 'contestant', transition = true) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = alt;
+        if (transition === true) {
+            img.style.transition = 'opacity 0.5s ease-in-out';
+            img.style.opacity = '0';
+        }
+        this.container.appendChild(img);
+
+        if (style === 'contestant') {
+            img.style.width = '100px';
+            img.style.height = '100px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '50%';
+            img.style.border = '2px solid #be9871';
+            img.style.margin = '5px';
+        }
+
+        return img;
+    }
+
+    addParagraph(text, id = '') {
+        const p = document.createElement('p');
+        p.textContent = text;
+        if (id) p.id = id;
+        this.container.appendChild(p);
+    }
+
+    addBoldParagraph(text, id = '') {
+        const p = document.createElement('p');
+        const strong = document.createElement('strong');
+        strong.textContent = text;
+        p.appendChild(strong);
+        if (id) p.id = id;
+        this.container.appendChild(p);
+    }
+
+    addButton(text, clickHandler) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.addEventListener('click', clickHandler);
+        this.container.appendChild(button);
+    }
+}
+
+const ui = new UI();
+function startEntranceSequence() {
+    ui.wipe();
+
+    console.log('Starting entrance sequence for the cast:', currentCast);
+
+    currentCast.forEach((contestant, index) => {
+        setTimeout(() => {
+            const imageElement = ui.addImage(contestant.image, contestant.name);
+            ui.addParagraph(`${contestant.name} has entered the house!`);
+
+            setTimeout(() => {
+                imageElement.style.opacity = '1';
+            }, 50);
+
+        }, index * 1000);
+    });
+
+    setTimeout(() => {
+        ui.addButton('Begin', newEpisode);
+    }, currentCast.length * 1000 + 500);
 }
 
 function newEpisode() {
+    episodeNumber += 1;
     console.log('Starting a new episode with the current cast:', currentCast);
+
+    ui.wipe();
+    ui.addBoldParagraph(`Episode ${episodeNumber}`, 'episode-title');
+
+    if (episodeNumber === 1 && currentCast.length > 10) {
+        if (Math.random() < 0.1) {
+            const poisonedContestantIndex = Math.floor(Math.random() * currentCast.length);
+            const poisonedContestant = currentCast[poisonedContestantIndex];
+            ui.addParagraph(`Oh no! ${poisonedContestant.name} has been poisoned...`);
+            ui.addBoldParagraph(`The rest of the houseguests must find the antidote before it's too late!`);
+
+            setTimeout(() => {
+                if (Math.random() < 0.5) {
+                    ui.addParagraph(`Luckily, the houseguests found the antidote in time! ${poisonedContestant.name} has been cured!`);
+                } else {
+                    ui.addParagraph(`Unfortunately, the houseguests couldn't find the antidote in time. ${poisonedContestant.name} has been died...`);
+                    currentCast.splice(poisonedContestantIndex, 1);
+                    deadContestants.push(poisonedContestant);
+                }
+            }, 3000);
+        }
+    }
 }

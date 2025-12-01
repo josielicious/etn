@@ -20,6 +20,8 @@ body {
 }
 
 #container {
+    margin-top: 10vh;
+    margin-bottom: 10vh;
     width: 100%;
     max-width: 1300px;
     padding: 20px;
