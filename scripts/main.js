@@ -7,6 +7,10 @@ class Contestant {
 
         this.placementTexts = [];
         this.placementColors = [];
+
+        this.workScore = 0;
+
+        this.relationships = {};
     }
 
     get name() {
@@ -250,7 +254,7 @@ const simulationButton = document.getElementById('start-simulation');
 simulationButton.addEventListener('click', startSimulation);
 
 let episodeNumber = 0;
-let deadContestants = 0;
+let deadContestants = [];
 
 function startSimulation() {
     if (currentCast.length <= 2) {
@@ -262,7 +266,6 @@ function startSimulation() {
 }
 
 // UI Class //
-// UI Class //
 class UI {
     constructor() {
         this.container = document.getElementById('container');
@@ -272,7 +275,7 @@ class UI {
         this.container.innerHTML = '';
     }
 
-    addImage(src, alt = '', style = 'contestant', transition = true) {
+    addImage(src, alt = '', style = 'contestant', transition = false) {
         const img = document.createElement('img');
         img.src = src;
         img.alt = alt;
@@ -289,6 +292,14 @@ class UI {
             img.style.borderRadius = '50%';
             img.style.border = '2px solid #be9871';
             img.style.margin = '5px';
+        } else if (style === 'dead') {
+            img.style.width = '100px';
+            img.style.height = '100px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '50%';
+            img.style.border = '2px solid #be9871';
+            img.style.margin = '5px';
+            img.style.filter = 'grayscale(100%)';
         }
 
         return img;
@@ -319,26 +330,58 @@ class UI {
 }
 
 const ui = new UI();
+
+function initializeRelationships() {
+    console.log('Initializing relationships...');
+    const livingCast = currentCast;
+
+    for (let i = 0; i < livingCast.length; i++) {
+        const contestantA = livingCast[i];
+
+        for (let j = i + 1; j < livingCast.length; j++) {
+            const contestantB = livingCast[j];
+            const initialScore = Math.floor(Math.random() * 6) - 5;
+
+            contestantA.relationships[contestantB.name] = initialScore;
+            contestantB.relationships[contestantA.name] = initialScore;
+        }
+    }
+    console.log('Initial Relationships:', currentCast.map(c => ({ name: c.name, relationships: c.relationships })));
+}
+
+function updateRelationship(contestantA, contestantB, scoreChange) {
+    const minScore = -10;
+    const maxScore = 10;
+
+    if (!contestantA.relationships[contestantB.name]) {
+        contestantA.relationships[contestantB.name] = 0;
+    }
+    if (!contestantB.relationships[contestantA.name]) {
+        contestantB.relationships[contestantA.name] = 0;
+    }
+
+    let newScoreA = contestantA.relationships[contestantB.name] + scoreChange;
+    newScoreA = Math.min(Math.max(newScoreA, minScore), maxScore);
+    contestantA.relationships[contestantB.name] = newScoreA;
+
+    let newScoreB = contestantB.relationships[contestantA.name] + scoreChange;
+    newScoreB = Math.min(Math.max(newScoreB, minScore), maxScore);
+    contestantB.relationships[contestantA.name] = newScoreB;
+    console.log(`${contestantA.name} and ${contestantB.name} relationship updated to ${newScoreA}`);
+}
+
 function startEntranceSequence() {
     ui.wipe();
 
     console.log('Starting entrance sequence for the cast:', currentCast);
+    initializeRelationships();
 
     currentCast.forEach((contestant, index) => {
-        setTimeout(() => {
-            const imageElement = ui.addImage(contestant.image, contestant.name);
-            ui.addParagraph(`${contestant.name} has entered the house!`);
-
-            setTimeout(() => {
-                imageElement.style.opacity = '1';
-            }, 50);
-
-        }, index * 1000);
+        ui.addImage(contestant.image, contestant.name);
+        ui.addParagraph(`${contestant.name} has entered the house!`);
     });
 
-    setTimeout(() => {
-        ui.addButton('Begin', newEpisode);
-    }, currentCast.length * 1000 + 500);
+    ui.addButton('Begin', newEpisode);
 }
 
 function newEpisode() {
@@ -352,18 +395,35 @@ function newEpisode() {
         if (Math.random() < 0.1) {
             const poisonedContestantIndex = Math.floor(Math.random() * currentCast.length);
             const poisonedContestant = currentCast[poisonedContestantIndex];
+
+            const nonPoisonedContestants = currentCast.filter(c => c.name !== poisonedContestant.name);
+            nonPoisonedContestants.forEach(c => {
+                c.workScore = Math.random() * 100;
+            });
+            const hardestWorker = nonPoisonedContestants.sort((a, b) => b.workScore - a.workScore)[0];
+
+            ui.addImage(poisonedContestant.image, poisonedContestant.name);
             ui.addParagraph(`Oh no! ${poisonedContestant.name} has been poisoned...`);
             ui.addBoldParagraph(`The rest of the houseguests must find the antidote before it's too late!`);
 
-            setTimeout(() => {
-                if (Math.random() < 0.5) {
-                    ui.addParagraph(`Luckily, the houseguests found the antidote in time! ${poisonedContestant.name} has been cured!`);
-                } else {
-                    ui.addParagraph(`Unfortunately, the houseguests couldn't find the antidote in time. ${poisonedContestant.name} has been died...`);
-                    currentCast.splice(poisonedContestantIndex, 1);
-                    deadContestants.push(poisonedContestant);
-                }
-            }, 3000);
+            if (Math.random() < 0.5) {
+                ui.addImage(poisonedContestant.image, poisonedContestant.name);
+                ui.addParagraph(`Luckily, the houseguests found the antidote in time! ${poisonedContestant.name} has been cured!`);
+
+                updateRelationship(poisonedContestant, hardestWorker, 3);
+
+                ui.addImage(hardestWorker.image, hardestWorker.name);
+                ui.addImage(poisonedContestant.image, poisonedContestant.name);
+                ui.addParagraph(`${hardestWorker.name}'s efforts earned ${poisonedContestant.name}'s gratitude!`);
+            } else {
+                ui.addImage(poisonedContestant.image, poisonedContestant.name, 'dead');
+                ui.addParagraph(`Unfortunately, the houseguests couldn't find the antidote in time. ${poisonedContestant.name} has been died...`);
+                currentCast.splice(poisonedContestantIndex, 1);
+                deadContestants.push(poisonedContestant);
+
+                ui.addImage(hardestWorker.image, hardestWorker.name);
+                ui.addParagraph(`${hardestWorker.name} did the most work...`);
+            }
         }
     }
 }
