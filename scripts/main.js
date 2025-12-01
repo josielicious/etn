@@ -381,6 +381,11 @@ function updateRelationship(contestantA, contestantB, scoreChange) {
 function resimulate() {
     episodeNumber = 0;
 
+    captureChallenge = false;
+    burialHappened = false;
+    pairChallenge = false;
+    doubleLive = false;
+    doubleDeath = false;
     currentCast.push(...deadCast);
     deadCast = [];
 
