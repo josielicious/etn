@@ -4,6 +4,9 @@ class Contestant {
         this._name = name;
         this._image = image;
         this._gender = gender;
+
+        this.placementTexts = [];
+        this.placementColors = [];
     }
 
     get name() {
@@ -98,7 +101,7 @@ const renderCastmates = () => {
     castSizeDisplay.textContent = currentCast.length;
 
     if (currentCast.length === 0) {
-        castmatesList.innerHTML = '<p style="font-style: italic; opacity: 0.8;">The cast is empty! Use the search bar or "Add Random" to build your season.</p>';
+        castmatesList.innerHTML = '<p style="font-style: italic; opacity: 0.8;">The cast is empty! Use the search bar or "Add Random" to build your season.<br>Or if you are lazy, or wanna resimulate a past cast, use the "Predefined Casts" button.</p>';
         return;
     }
 
@@ -244,12 +247,18 @@ renderCastmates();
 
 // Simulation Initialization //
 const simulationButton = document.getElementById('start-simulation');
-
 simulationButton.addEventListener('click', startSimulation);
+
+let episodeNumber = 0;
+let deadContestants = 0;
 
 function startSimulation() {
     if (currentCast.length <= 2) {
         alert('Please add at least 3 castmates to start the simulation.');
         return;
     }
+}
+
+function newEpisode() {
+    console.log('Starting a new episode with the current cast:', currentCast);
 }
