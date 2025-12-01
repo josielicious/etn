@@ -835,10 +835,11 @@ function finalDeathChallenge() {
         return;
     }
     if (!pairChallenge) {
-        if (Math.random() < 0.2) {
+        if (Math.random() < 0.25 && !betrayalDeath) {
+            betrayalDeath = true;
             const nonNominees = currentCast.filter(q => !deathNominees.includes(q));
 
-            ui.addBoldParagraph('The contestants are both safe');
+            ui.addBoldParagraph('The contestants are have both been spared and are safe');
             ui.addImage(deathNominees[0].image, deathNominees[0].name);
             ui.addImage(deathNominees[1].image, deathNominees[1].name);
             ui.addParagraph(`However, ${deathNominees[0].name} and ${deathNominees[1].name} MUST betray a contestant.`);
@@ -854,6 +855,9 @@ function finalDeathChallenge() {
             ui.addImage(nominee.image, nominee.name);
             ui.addParagraph(`${deathNominees[0].name} and ${deathNominees[1].name} have agreed on betraying ${nominee.name} `);
             ui.addBoldParagraph(`${nominee.name} has been murdered...`)
+
+            nominee.placementTexts.pop();
+            nominee.placementColors.pop();
 
             nominee.placementTexts.push('DEAD');
             nominee.placementColors.push('#b22222');
