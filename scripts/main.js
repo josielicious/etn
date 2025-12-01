@@ -612,8 +612,8 @@ function bestRelationshipPair(person, group) {
 let votePool = [];
 let deathNominees = [];
 
+let captureChallenge = false;
 let burialHappened = false;
-
 let pairChallenge = false;
 
 function shuffleArray(array) {
@@ -627,20 +627,27 @@ function newEpisode() {
     episodeNumber += 1;
     console.log('Starting a new episode with the current cast:', currentCast);
 
-    ui.wipe();
-    ui.addBoldParagraph(`Episode ${episodeNumber}`, 'episode-title');
-    ui.addRow();
+    if (episodeNumber === 1) {
+        artifactsLeft = currentCast.length - 3;
+    }
 
     deadCast.forEach(contestant => {
         contestant.placementColors.push('lightgray');
         contestant.placementTexts.push(' ');
     });
 
+    if (artifactsLeft == 0) {
+        startFinale();
+        return;
+    }
+
+    ui.wipe();
+    ui.addBoldParagraph(`Episode ${episodeNumber}`, 'episode-title');
+    ui.addRow();
+
     votePool = [];
 
     if (episodeNumber === 1) {
-        artifactsLeft = currentCast.length - 3;
-
         ui.addParagraph("The houseguests are settling in and getting to know each other...");
         if (Math.random() < 0.1 && currentCast.length > 10) {
             const poisonedContestantIndex = Math.floor(Math.random() * currentCast.length);
@@ -817,6 +824,32 @@ function newEpisode() {
     }
 }
 
+let seasonOver = false;
+
+function startFinale() {
+    ui.wipe();
+    ui.addBoldParagraph(`Episode ${episodeNumber} - Finale`, 'episode-title');
+    ui.addRow();
+
+    ui.addParagraph(`The remaining three houseguests dash towards the exit`);
+
+    currentCast.forEach(contestant => {
+        ui.addImage(contestant.image, contestant.name);
+        ui.addParagraph(`${contestant.name} has escaped the house`);
+
+        if (contestant.role === 'The Savant') {
+            contestant.placementTexts.push('HOST');
+        } else {
+            contestant.placementTexts.push('WINNER');
+        }
+        contestant.placementColors.push('#90ee90')
+    });
+
+    seasonOver = true;
+
+    ui.addButton('Proceed', contestantProgress);
+}
+
 let betrayalDeath = false;
 
 let doubleDeath = false;
@@ -920,6 +953,8 @@ function finalDeathChallenge() {
                     nominee.placementTexts.push('VOTE');
                     nominee.placementColors.push('hotpink');
                 });
+
+                artifactsLeft += 1;
             } else {
                 ui.addBoldParagraph('A contestant completes the challenge just in time...');
 
