@@ -1040,8 +1040,10 @@ function contestantProgress() {
     ui.addBoldParagraph('Contestant Progress', 'episode-title');
     ui.addRow();
     const center = document.createElement('center');
+    const containerToCapture = document.createElement('div');
 
     const table = document.createElement('table');
+    table.id = 'progress-container';
     const headerRow = document.createElement('tr');
     const nameHeader = document.createElement('th');
     nameHeader.textContent = 'Contestant';
@@ -1085,8 +1087,43 @@ function contestantProgress() {
 
     pairChallenge = false;
 
-    center.appendChild(table);
+    containerToCapture.appendChild(table);
+    center.appendChild(containerToCapture);
     ui.container.appendChild(center);
 
-    ui.addButton('Next Episode', newEpisode);
+    ui.addButton('Download', downloadProgress);
+    if (!seasonOver) {
+        ui.addButton('Next Episode', newEpisode);
+    } else {
+        ui.addButton('Resimulate', resimulate);
+    }
+}
+
+function downloadProgress() {
+    const input = document.getElementById('progress-container');
+
+    if (!input) {
+        console.error("Progress container element not found!");
+        alert("Cannot find the table to download. Please ensure the structure is correct.");
+        return;
+    }
+
+    html2canvas(input, {
+        scale: 2,
+        logging: false,
+        backgroundColor: '#000'
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+
+        link.download = `TrackRecord_Episode${episodeNumber}.png`;
+        link.href = imgData;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }).catch(err => {
+        console.error("Error generating image:", err);
+        alert("Failed to generate the image for download.");
+    });
 }
