@@ -58,7 +58,7 @@ const rosannapansino = new Contestant("Rosanna Pansino", "resources/images/conte
 const tanamongeau = new Contestant("Tana Mongeau", "resources/images/contestants/TLT/tanamongeau.webp");
 
 const PREDEFINED_CASTS = {
-    'Season 1': [joeygraceffa, andreabrooks, evagutowski, glozellgreen, justineezarik, lelepons, matthaag, oliwhite, shanedawson, sierrafurtado],
+    'Season 1': [joeygraceffa, evagutowski, oliwhite, lelepons, timothydelaghetto, matthaag, sierrafurtado, glozellgreen, justineezarik, andreabrooks, shanedawson],
     'Season 2': [joeygraceffa, andrearusset, alexwassabi, destormpower, gabbiehanna, jessewellens, laurenriihimaki, lizakoshy, tanamongeau, tyleroakley],
     'Season 3': [joeygraceffa, colleenballinger, jccaylen, mannymua, matthewpatrick, nikitadragun, roifabito, rosannapansino, safiyanygaard, tealadunn],
     'Season 4': [joeygraceffa, alexwassabi, bretmanrock, colleenballinger, destormpower, gabbiehanna, justineezarik, rosannapansino, tanamongeau, timothydelaghetto],
