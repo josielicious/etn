@@ -5,6 +5,8 @@ class Contestant {
         this._image = image;
         this._gender = gender;
 
+        this.role = 'The Savant';
+
         this.placementTexts = [];
         this.placementColors = [];
 
@@ -254,7 +256,7 @@ const simulationButton = document.getElementById('start-simulation');
 simulationButton.addEventListener('click', startSimulation);
 
 let episodeNumber = 0;
-let deadContestants = [];
+let deadCast = [];
 
 function startSimulation() {
     if (currentCast.length <= 2) {
@@ -327,6 +329,11 @@ class UI {
         button.addEventListener('click', clickHandler);
         this.container.appendChild(button);
     }
+
+    addRow() {
+        const hr = document.createElement('hr');
+        this.container.appendChild(hr);
+    }
 }
 
 const ui = new UI();
@@ -370,18 +377,222 @@ function updateRelationship(contestantA, contestantB, scoreChange) {
     console.log(`${contestantA.name} and ${contestantB.name} relationship updated to ${newScoreA}`);
 }
 
+function resimulate() {
+    episodeNumber = 0;
+
+    currentCast.push(...deadCast);
+    deadCast = [];
+
+    currentCast.forEach(contestant => {
+        contestant.role = '';
+
+        contestant.workScore = 0;
+
+        contestant.placementTexts = [];
+        contestant.placementColors = [];
+
+        contestant.relationships = {};
+    });
+}
+
+const roleList = [
+    'The Savant',
+    'The Journalist',
+    'The Big Game Hunter',
+    'The Hustler',
+    'The Mobster',
+    'The Professor',
+    'The Heiress',
+    'The Jazz Singer',
+    'The Gambler',
+    'The Fixer',
+    'The Renegade',
+    'The Mystic',
+    'The Thespian',
+    'The Novelist',
+    'The Vaudevillian',
+    'The Saloon Girl',
+    'The Explorer',
+    'The Railroad Tycoon',
+    'The Outlaw',
+    'The Engineer',
+    'The Detective',
+    'The Troublemaker',
+    'The Record Producer',
+    'The Jet-Setter',
+    'The Investigative Reporter',
+    'The Disco Dancer',
+    'The Super Spy',
+    'The Daredevil',
+    'The Hippie',
+    'The Duchess',
+    'The Playboy',
+    'The Socialite',
+    'The Aviator',
+    'The Hollywood Star',
+    'The Pin-Up Girl',
+    'The Enforcer',
+    'The Con Man',
+    'The Adventurer',
+    'The Glam Rocker',
+    'The Jock',
+    'The Fitness Instructor',
+    'The Burnout',
+    'The Prom Queen'
+];
+
+const usedRoles = [];
+
+function getRandomRole() {
+    const availableRoles = roleList.filter(role => !usedRoles.includes(role));
+    if (availableRoles.length === 0) {
+        usedRoles = 0;
+        availableRoles = roleList;
+    }
+
+    const selectedRole = availableRoles[Math.floor(Math.random() * availableRoles.length)];
+    usedRoles.push(selectedRole);
+
+    return selectedRole;
+}
+
 function startEntranceSequence() {
     ui.wipe();
 
     console.log('Starting entrance sequence for the cast:', currentCast);
     initializeRelationships();
 
+    ui.addBoldParagraph(`The ${currentCast.length} guests enter the house...`, 'episode-title');
+    ui.addRow();
+
     currentCast.forEach((contestant, index) => {
+        contestant.role = getRandomRole();
+
         ui.addImage(contestant.image, contestant.name);
+        ui.addBoldParagraph(`${contestant.name} - ${contestant.role}`);
         ui.addParagraph(`${contestant.name} has entered the house!`);
     });
 
     ui.addButton('Begin', newEpisode);
+}
+
+let artifactsLeft = 0;
+
+const workActions = {
+    low: [
+        'barely lifts a finger and ends up making a mess instead',
+        'gets overwhelmed and sits on the floor breathing heavily',
+        'wanders around aimlessly, pretending to look busy',
+        'has a mini breakdown and isolates themselves in the bathroom',
+        'starts cleaning something, then immediately gives up',
+        'finds a sticky note and declares that it is a clue.'
+    ],
+    mediumLow: [
+        'attempts to work but gets distracted by every small noise',
+        'starts a task, then abandons it halfway for something else',
+        'complains quietly about how exhausting everything is',
+        'keeps asking others if they’re doing things correctly',
+        'tries organizing a drawer but ends up stuffing everything inside'
+    ],
+    medium: [
+        'does their assigned task with moderate efficiency',
+        'helps tidy up a room but misses some obvious spots',
+        'searches for useful items but overlooks important ones',
+        'does a decent job but needs occasional breaks',
+        'works at a steady pace without attracting attention'
+    ],
+    mediumHigh: [
+        'shows real focus and starts finding valuable items',
+        'cleans a whole room impressively well',
+        'discovers something interesting and documents it carefully',
+        'coordinates quietly with others to be more productive',
+        'keeps the momentum going and motivates nearby houseguests'
+    ],
+    high: [
+        'works with remarkable dedication and finds clues quickly',
+        'strategically organizes everyone’s tasks like a leader',
+        'uncovers something extremely important to the storyline',
+        'cleans, sorts, searches AND reports findings flawlessly',
+        'singlehandedly accomplishes more than half the house combined'
+    ]
+};
+
+const discussionPrompts = [
+    (a, b) => `${a} and ${b} argue about who’s slacking the most.`,
+    (a, b) => `${a} and ${b} team up and start working together efficiently.`,
+    (a, b) => `${a} vents to ${b} about the stress of living in the house.`,
+    (a, b) => `${a} and ${b} get distracted chatting about last night’s drama.`,
+    (a, b) => `${a} teaches ${b} a better way to search the house.`,
+    (a, b) => `${a} accuses ${b} of hiding items to sabotage the group.`,
+    (a, b) => `${a} and ${b} discover something together and freak out.`,
+];
+
+function houseguestWorkPhase() {
+    currentCast.forEach(contestant => {
+        contestant.workScore = Math.random() * 100;
+
+        let actionList;
+        if (contestant.workScore < 20) actionList = workActions.low;
+        else if (contestant.workScore < 40) actionList = workActions.mediumLow;
+        else if (contestant.workScore < 60) actionList = workActions.medium;
+        else if (contestant.workScore < 80) actionList = workActions.mediumHigh;
+        else actionList = workActions.high;
+
+        const action = actionList[Math.floor(Math.random() * actionList.length)];
+
+        ui.addImage(contestant.image, contestant.name);
+        ui.addParagraph(`${contestant.name} ${action}.`);
+    });
+
+    const discussionCount = Math.floor(Math.random() * 3);
+
+    for (let i = 0; i < discussionCount; i++) {
+        const personA = currentCast[Math.floor(Math.random() * currentCast.length)];
+        let personB = currentCast[Math.floor(Math.random() * currentCast.length)];
+
+        while (personA === personB) {
+            personB = currentCast[Math.floor(Math.random() * currentCast.length)];
+        }
+
+        const prompt = discussionPrompts[Math.floor(Math.random() * discussionPrompts.length)];
+
+        ui.addImage(personA.image, personA.name);
+        ui.addImage(personB.image, personB.name);
+        ui.addParagraph(prompt(personA.name, personB.name));
+    }
+}
+
+function worstRelationshipPair(person, group) {
+    const livingCast = group.filter(c => c.name !== person.name);
+
+    if (livingCast.length === 0) {
+        return null;
+    }
+
+    let worstScore = 11;
+    let worstContestant = null;
+
+    for (const contestantB of livingCast) {
+        const score = person.relationships[contestantB.name] || 0;
+
+        if (score < worstScore) {
+            worstScore = score;
+            worstContestant = contestantB;
+        }
+    }
+
+    console.log(`${person.name}'s worst relationship is with ${worstContestant ? worstContestant.name : 'nobody'}, score: ${worstScore}`);
+    return worstContestant;
+}
+
+let votePool = [];
+let deathNominees = [];
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }
 
 function newEpisode() {
@@ -390,9 +601,15 @@ function newEpisode() {
 
     ui.wipe();
     ui.addBoldParagraph(`Episode ${episodeNumber}`, 'episode-title');
+    ui.addRow();
 
-    if (episodeNumber === 1 && currentCast.length > 10) {
-        if (Math.random() < 0.1) {
+    votePool = [];
+
+    if (episodeNumber === 1) {
+        artifactsLeft = currentCast.length - 3;
+
+        ui.addParagraph("The houseguests are settling in and getting to know each other...");
+        if (Math.random() < 0.1 && currentCast.length > 10) {
             const poisonedContestantIndex = Math.floor(Math.random() * currentCast.length);
             const poisonedContestant = currentCast[poisonedContestantIndex];
 
@@ -419,11 +636,266 @@ function newEpisode() {
                 ui.addImage(poisonedContestant.image, poisonedContestant.name, 'dead');
                 ui.addParagraph(`Unfortunately, the houseguests couldn't find the antidote in time. ${poisonedContestant.name} has been died...`);
                 currentCast.splice(poisonedContestantIndex, 1);
-                deadContestants.push(poisonedContestant);
+                deadCast.push(poisonedContestant);
 
                 ui.addImage(hardestWorker.image, hardestWorker.name);
                 ui.addParagraph(`${hardestWorker.name} did the most work...`);
+
+                currentCast.forEach(c => {
+                    c.workScore = 0;
+                });
             }
+            ui.addParagraph(`The guests find out the must find ${artifactsLeft} artifacts to survive...`);
+            ui.addBoldParagraph(`For each artifact found, they must cleanse it, in exchange for a human life...`);
+        } else {
+            ui.addParagraph(`The guests find out the must find ${artifactsLeft} artifacts to survive...`);
+            ui.addBoldParagraph(`For each artifact found, they must cleanse it, in exchange for a human life...`);
         }
+
+        ui.addRow();
     }
+
+    houseguestWorkPhase();
+
+    ui.addRow();
+    ui.addBoldParagraph(`Suddenly, the houseguests get chased by a monster.`);
+    ui.addParagraph(`In the chaos, they scatter and search for artifacts to survive...`);
+
+    currentCast.forEach(contestant => {
+        contestant.workScore = Math.random() * 100;
+    });
+
+    const hardestWorker = currentCast.sort((a, b) => b.workScore - a.workScore)[0];
+    ui.addImage(hardestWorker.image, hardestWorker.name);
+    ui.addParagraph(`${hardestWorker.name} manages to find an artifact!`);
+
+    artifactsLeft -= 1;
+    ui.addRow();
+
+    ui.addBoldParagraph(`To cleanse the artifact, a sacrifice must be made...`);
+    if (Math.random() < 0.1) {
+        ui.addParagraph(`A contestant must be BURIED alive in order to cleanse the artifact...`);
+        currentCast.forEach(contestant => {
+            contestant.vote = worstRelationshipPair(contestant, currentCast);
+            votePool.push(contestant.vote);
+            ui.addImage(contestant.image, contestant.name);
+            ui.addImage(contestant.vote.image, contestant.vote.image);
+            ui.addParagraph(`${contestant.name} writes ${contestant.vote.name}'s name.`);
+        });
+
+        ui.addBoldParagraph(`The votes are in...`);
+        ui.addParagraph('After shuffling the votes, the person meeting their fate is...');
+
+        shuffleArray(votePool);
+
+        const nominee = votePool[0];
+        ui.addParagraph(`${nominee.name} has been chosen to be BURIED alive!`);
+
+        if (Math.random() < 0.5) {
+            ui.addImage(nominee.image, nominee.name, 'dead');
+            ui.addParagraph(`The houseguests carry out the grim task, ${nominee.name} has been BURIED alive...`);
+            const nomineeIndex = currentCast.findIndex(c => c.name === nominee.name);
+            currentCast.splice(nomineeIndex, 1);
+            deadCast.push(nominee);
+        } else {
+            ui.addImage(nominee.image, nominee.name);
+            ui.addParagraph(`Suddenly ${nominee.name} runs away! The houseguests catch them.`);
+
+            ui.addImage(nominee.image, nominee.name, 'dead');
+            ui.addParagraph(`The houseguests carry out the grim task, ${nominee.name} has been BURIED alive...`);
+            const nomineeIndex = currentCast.findIndex(c => c.name === nominee.name);
+            currentCast.splice(nomineeIndex, 1);
+            deadCast.push(nominee);
+        }
+
+        nominee.placementTexts.push('DEAD');
+        nominee.placementColors.push('red');
+
+        const nonNominees = currentCast.filter(c => c.name !== nominee.name);
+        nonNominees.forEach(c => {
+            c.placementColors.push('white');
+            c.placementTexts.push('SAFE');
+        });
+        ui.addButton('Proceed', contestantProgress);
+    } else {
+        ui.addParagraph(`The houseguests must vote a contestant each...`);
+        currentCast.forEach(contestant => {
+            contestant.vote = worstRelationshipPair(contestant, currentCast);
+            votePool.push(contestant.vote);
+            ui.addImage(contestant.image, contestant.name);
+            ui.addImage(contestant.vote.image, contestant.vote.image);
+            ui.addParagraph(`${contestant.name} chooses ${contestant.vote.name}'s tarot card.`);
+        });
+
+        ui.addBoldParagraph(`The votes are in...`);
+        ui.addParagraph('After shuffling the votes, the first tarot card drawn is...');
+
+        shuffleArray(votePool);
+
+        const nominee1 = votePool[0];
+        ui.addImage(nominee1.image, nominee1.name);
+        ui.addParagraph(`The first card drawn reveals ${nominee1.name}!`);
+
+        const remainingVotePool = votePool.slice(1);
+        const filteredVotePool = remainingVotePool.filter(contestant => contestant.name !== nominee1.name);
+
+        const nominee2 = filteredVotePool[0];
+        ui.addImage(nominee2.image, nominee2.name);
+        ui.addParagraph(`The first card drawn reveals ${nominee2.name}!`);
+
+        deathNominees = [nominee1, nominee2];
+
+        const nonNominees = currentCast.filter(c => c.name !== nominee1.name && c.name !== nominee2.name);
+        nonNominees.forEach(c => {
+            c.placementColors.push('white');
+            c.placementTexts.push('SAFE');
+        });
+
+        ui.addButton('Proceed', finalDeathChallenge);
+    }
+}
+
+const doubleDeath = false;
+const doubleLive = false;
+
+function finalDeathChallenge() {
+    ui.wipe();
+    ui.addBoldParagraph(`The final death challenge begins...`);
+
+    if (typeof ui.addRow === 'function') {
+        ui.addRow();
+    }
+
+    if (!Array.isArray(deathNominees) || deathNominees.length < 2) {
+        ui.addParagraph('Error: Not enough death nominees to start the challenge.');
+        return;
+    }
+
+    deathNominees.forEach(contestant => {
+        contestant.workScore = Math.random() * 100;
+    });
+
+    const sortedNominees = [...deathNominees].sort((a, b) => b.workScore - a.workScore);
+    const winner = sortedNominees[0];
+    const loser = sortedNominees[1];
+
+    if (Math.random() < 0.05 && doubleDeath === false) {
+        ui.addBoldParagraph('The contestants fail to complete the challenge in time, and both are murdered!');
+
+        ui.addImage(deathNominees[0].image, deathNominees[0].name);
+        ui.addImage(deathNominees[1].image, deathNominees[1].name);
+
+        deathNominees.forEach(nominee => {
+            nominee.placementTexts.push('DEAD');
+            nominee.placementColors.push('red');
+            deadCast.push(nominee);
+        });
+
+        currentCast = currentCast.filter(c => c.name !== deathNominees[0].name && c.name !== deathNominees[1].name);
+
+        ui.addParagraph(`${deathNominees[0].name} and ${deathNominees[1].name} are both murdered!`);
+
+        if (typeof ui.addRow === 'function') {
+            ui.addRow();
+        }
+
+        ui.addParagraph('The other houseguest attempt to finish the challenge for them...');
+
+        currentCast.forEach(contestant => {
+            contestant.workScore = Math.random() * 100;
+        });
+
+        const hardestWorker = currentCast.sort((a, b) => b.workScore - a.workScore)[0];
+        ui.addImage(hardestWorker.image, hardestWorker.name);
+        ui.addParagraph(`${hardestWorker.name} manages to finish the challenge!`);
+
+    } else if (Math.random() < 0.1 && doubleLive === false) {
+        ui.addBoldParagraph('The contestants exceed all expectations, and both survive!');
+        ui.addImage(deathNominees[0].image, deathNominees[0].name);
+        ui.addImage(deathNominees[1].image, deathNominees[1].name);
+        ui.addParagraph(`${deathNominees[0].name} and ${deathNominees[1].name} both survive the challenge!`);
+
+        deathNominees.forEach(nominee => {
+            nominee.placementTexts.push('VOTE');
+            nominee.placementColors.push('hotpink');
+        });
+    } else {
+        ui.addBoldParagraph('A contestant completes the challenge just in time...');
+
+        ui.addImage(winner.image, winner.name);
+        ui.addParagraph(`${winner.name} wins the challenge and survives!`);
+
+        winner.placementTexts.push('VOTE');
+        winner.placementColors.push('lightpink');
+
+        ui.addImage(loser.image, loser.name, 'dead');
+        ui.addParagraph(`${loser.name} has been murdered!`);
+
+        loser.placementTexts.push('DEAD');
+        loser.placementColors.push('red');
+
+        const eliminatedIndex = currentCast.findIndex(c => c.name === loser.name);
+        if (eliminatedIndex !== -1) {
+            currentCast.splice(eliminatedIndex, 1);
+        }
+        deadCast.push(loser);
+    }
+
+    ui.addButton('Proceed', contestantProgress);
+}
+
+function contestantProgress() {
+    ui.wipe();
+    ui.addBoldParagraph('Contestant Progress', 'episode-title');
+    ui.addRow();
+    const center = document.createElement('center');
+
+    const table = document.createElement('table');
+    const headerRow = document.createElement('tr');
+    const nameHeader = document.createElement('th');
+    nameHeader.textContent = 'Contestant';
+    headerRow.appendChild(nameHeader);
+    for (let i = 1; i <= episodeNumber; i++) {
+        const episodeHeader = document.createElement('th');
+        episodeHeader.textContent = `Ep ${i}`;
+        headerRow.appendChild(episodeHeader);
+    }
+    table.appendChild(headerRow);
+
+    currentCast.forEach(contestant => {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        nameCell.textContent = contestant.name;
+        row.appendChild(nameCell);
+        for (let i = 0; i < episodeNumber; i++) {
+            const statusCell = document.createElement('td');
+            statusCell.innerHTML = contestant.placementTexts[i] || '';
+            statusCell.style.color = 'black';
+            statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
+            row.appendChild(statusCell);
+        }
+        table.appendChild(row);
+    });
+
+    const reversedDead = deadCast.reverse();
+
+    reversedDead.forEach(contestant => {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        nameCell.textContent = contestant.name;
+        row.appendChild(nameCell);
+        for (let i = 0; i < episodeNumber; i++) {
+            const statusCell = document.createElement('td');
+            statusCell.innerHTML = contestant.placementTexts[i] || '';
+            statusCell.style.color = 'black';
+            statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
+            row.appendChild(statusCell);
+        }
+        table.appendChild(row);
+    });
+
+    center.appendChild(table);
+    ui.container.appendChild(center);
+
+    ui.addButton('Next Episode', newEpisode);
 }

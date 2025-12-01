@@ -213,3 +213,18 @@ input[type="search"]:hover {
         font-size: 1.1rem;
     }
 }
+
+tr {
+    height: 40px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #28242e;
+}
+
+td {
+    padding: 10px;
+    background-color: white;
+    color: black
+}
