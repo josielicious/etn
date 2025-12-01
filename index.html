@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Escape the Night</title>
+    <link rel="icon" href="resources/logo.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="scripts/main.js" defer></script>
+</head>
+
+<body>
+    <div id="container">
+        <div id="simulator-notice">
+            <p>Simulate the "Escape the Night" season of your dreams.</p>
+        </div>
+        <div id="cast-container">
+            <div id="controls">
+                <input type="search" id="search-castmate" placeholder="Search for Contestants..." />
+                <button id="random-castmate">Add Random</button>
+                <button id="predefined-cast">Predefined Cast</button>
+                <div id="predefined-menu" class="dropdown-menu" style="display: none;">
+                </div>
+            </div>
+
+            <!-- Search Results Area -->
+            <div id="search-results" style="display: none;"></div>
+
+            <b>Cast Size: <span id="cast-size">0</span></b>
+            <div id="castmates-list">
+                <!-- Castmate cards will be rendered here -->
+            </div>
+        </div>
+        <button id="start-simulation">Start Simulation</button>
+</body>
+
+</html>
