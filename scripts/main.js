@@ -1051,8 +1051,14 @@ function contestantProgress() {
     table.id = 'progress-container';
     const headerRow = document.createElement('tr');
     const nameHeader = document.createElement('th');
+    const nameHeader2 = document.createElement('th');
+    const nameHeader3 = document.createElement('th');
     nameHeader.textContent = 'Contestant';
+    nameHeader2.textContent = 'Image';
+    nameHeader3.textContent = 'Role';
     headerRow.appendChild(nameHeader);
+    headerRow.appendChild(nameHeader2);
+    headerRow.appendChild(nameHeader3);
     for (let i = 1; i <= episodeNumber; i++) {
         const episodeHeader = document.createElement('th');
         episodeHeader.textContent = `Ep ${i} `;
@@ -1064,7 +1070,14 @@ function contestantProgress() {
         const row = document.createElement('tr');
         const nameCell = document.createElement('td');
         nameCell.textContent = contestant.name;
+        const imageCell = document.createElement('td');
+        imageCell.style.backgroundImage = `url(${contestant.image})`;
+        imageCell.style.backgroundSize = 'cover';
+        const rolecell = document.createElement('td');
+        rolecell.textContent = contestant.role;
         row.appendChild(nameCell);
+        row.appendChild(imageCell);
+        row.appendChild(rolecell);
         for (let i = 0; i < episodeNumber; i++) {
             const statusCell = document.createElement('td');
             statusCell.innerHTML = contestant.placementTexts[i] || '';
@@ -1079,7 +1092,14 @@ function contestantProgress() {
         const row = document.createElement('tr');
         const nameCell = document.createElement('td');
         nameCell.textContent = contestant.name;
+        const imageCell = document.createElement('td');
+        imageCell.style.backgroundImage = `url(${contestant.image})`;
+        imageCell.style.backgroundSize = 'cover';
+        const rolecell = document.createElement('td');
+        rolecell.textContent = contestant.role;
         row.appendChild(nameCell);
+        row.appendChild(imageCell);
+        row.appendChild(rolecell);
         for (let i = 0; i < episodeNumber; i++) {
             const statusCell = document.createElement('td');
             statusCell.innerHTML = contestant.placementTexts[i] || '';
