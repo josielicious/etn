@@ -381,6 +381,8 @@ function updateRelationship(contestantA, contestantB, scoreChange) {
 function resimulate() {
     episodeNumber = 0;
 
+    seasonOver = false;
+
     captureChallenge = false;
     burialHappened = false;
     pairChallenge = false;
@@ -390,6 +392,7 @@ function resimulate() {
     deadCast = [];
 
     currentCast.forEach(contestant => {
+        contestant.helper = null;
         contestant.role = '';
 
         contestant.workScore = 0;
@@ -399,6 +402,8 @@ function resimulate() {
 
         contestant.relationships = {};
     });
+
+    startSimulation();
 }
 
 const roleList = [
@@ -703,129 +708,183 @@ function newEpisode() {
     houseguestWorkPhase();
 
     ui.addRow();
-    ui.addBoldParagraph(`Suddenly, the houseguests get chased by a monster.`);
-    ui.addParagraph(`In the chaos, they scatter and search for artifacts to survive...`);
-
-    currentCast.forEach(contestant => {
-        contestant.workScore = Math.random() * 100;
-    });
-
-    const hardestWorker = currentCast.sort((a, b) => b.workScore - a.workScore)[0];
-    ui.addImage(hardestWorker.image, hardestWorker.name);
-    ui.addParagraph(`${hardestWorker.name} manages to find an artifact!`);
-
-    artifactsLeft -= 1;
-    ui.addRow();
-
-    ui.addBoldParagraph(`To cleanse the artifact, a sacrifice must be made...`);
-    if (Math.random() < 0.1 && !burialHappened) {
-        burialHappened = true;
-
-        ui.addParagraph(`A contestant must be BURRIED alive in order to cleanse the artifact...`);
-        currentCast.forEach(contestant => {
-            contestant.vote = worstRelationshipPair(contestant, currentCast);
-            votePool.push(contestant.vote);
-            ui.addImage(contestant.image, contestant.name);
-            ui.addImage(contestant.vote.image, contestant.vote.image);
-            ui.addParagraph(`${contestant.name} writes ${contestant.vote.name}'s name.`);
-        });
-
-        ui.addBoldParagraph(`The votes are in...`);
-        ui.addParagraph('After shuffling the votes, the person meeting their fate is...');
-
-        shuffleArray(votePool);
-
-        const nominee = votePool[0];
-        ui.addParagraph(`${nominee.name} has been chosen to be BURIED alive!`);
-
+    if (artifactsLeft == 1 && currentCast.length === 4 && Math.random() < 0.5) {
+        ui.addBoldParagraph(`The guests find the last artifact.`);
         if (Math.random() < 0.5) {
-            ui.addImage(nominee.image, nominee.name, 'dead');
-            ui.addParagraph(`The houseguests carry out the grim task, ${nominee.name} has been BURIED alive...`);
-            const nomineeIndex = currentCast.findIndex(c => c.name === nominee.name);
-            currentCast.splice(nomineeIndex, 1);
-            deadCast.unshift(nominee);
+            const captured = currentCast[3];
+
+            currentCast.forEach(contestant => {
+                ui.addImage(contestant.image, contestant.name);
+            })
+            ui.addParagraph('All of the contestant reach the exit until...');
+
+            ui.addImage(captured.image, captured.name);
+            ui.addBoldParagraph(`${captured.name}  is stopped by an invisible force and dragged away...`);
+
+            const deadIndex = currentCast.findIndex(c => c.name === captured.name);
+            currentCast.splice(deadIndex, 1);
+            deadCast.unshift(captured);
+
+            captured.placementColors.push('red');
+            captured.placementTexts.push('DEAD');
+
+            currentCast.forEach(contestant => {
+                contestant.placementColors.push('tomato');
+                contestant.placementTexts.push('RACE');
+            });
         } else {
-            ui.addImage(nominee.image, nominee.name);
-            ui.addParagraph(`Suddenly ${nominee.name} runs away! The houseguests catch them.`);
+            currentCast.forEach(contestant => {
+                contestant.workScore = Math.random() * 100;
+            });
 
-            ui.addImage(nominee.image, nominee.name, 'dead');
-            ui.addParagraph(`The houseguests carry out the grim task, ${nominee.name} has been BURIED alive...`);
-            const nomineeIndex = currentCast.findIndex(c => c.name === nominee.name);
-            currentCast.splice(nomineeIndex, 1);
-            deadCast.unshift(nominee);
+            const captured = currentCast.sort((a, b) => a.workScore - b.workScore)[0];
+
+            currentCast.forEach(contestant => {
+                ui.addImage(contestant.image, contestant.name);
+            })
+            ui.addParagraph('All of the contestant race for survival...');
+
+            ui.addImage(captured.image, captured.name);
+            ui.addBoldParagraph(`${captured.name} doesn't make it in time and is murdered.`);
+
+            const deadIndex = currentCast.findIndex(c => c.name === captured.name);
+            currentCast.splice(deadIndex, 1);
+            deadCast.unshift(captured);
+
+            captured.placementColors.push('red');
+            captured.placementTexts.push('DEAD');
+
+            currentCast.forEach(contestant => {
+                contestant.placementColors.push('tomato');
+                contestant.placementTexts.push('RACE');
+            });
         }
-
-        nominee.placementTexts.push('DEAD');
-        nominee.placementColors.push('#b22222');
-
-        const nonNominees = currentCast.filter(c => c.name !== nominee.name);
-        nonNominees.forEach(c => {
-            c.placementColors.push('white');
-            c.placementTexts.push('SAFE');
-        });
         ui.addButton('Proceed', contestantProgress);
     } else {
-        ui.addParagraph(`The houseguests must vote a contestant each...`);
+        ui.addBoldParagraph(`Suddenly, the houseguests get chased by a monster.`);
+        ui.addParagraph(`In the chaos, they scatter and search for artifacts to survive...`);
+
         currentCast.forEach(contestant => {
-            contestant.vote = worstRelationshipPair(contestant, currentCast);
-            votePool.push(contestant.vote);
-            ui.addImage(contestant.image, contestant.name);
-            ui.addImage(contestant.vote.image, contestant.vote.image);
-            ui.addParagraph(`${contestant.name} chooses ${contestant.vote.name}'s tarot card.`);
+            contestant.workScore = Math.random() * 100;
         });
 
-        ui.addBoldParagraph(`The votes are in...`);
-        ui.addParagraph('After shuffling the votes, the first tarot card drawn is...');
+        const hardestWorker = currentCast.sort((a, b) => b.workScore - a.workScore)[0];
+        ui.addImage(hardestWorker.image, hardestWorker.name);
+        ui.addParagraph(`${hardestWorker.name} manages to find an artifact!`);
 
-        shuffleArray(votePool);
+        artifactsLeft -= 1;
+        ui.addRow();
+
+        ui.addBoldParagraph(`To cleanse the artifact, a sacrifice must be made...`);
+        if (Math.random() < 0.1 && !burialHappened) {
+            burialHappened = true;
+
+            ui.addParagraph(`A contestant must be BURRIED alive in order to cleanse the artifact...`);
+            currentCast.forEach(contestant => {
+                contestant.vote = worstRelationshipPair(contestant, currentCast);
+                votePool.push(contestant.vote);
+                ui.addImage(contestant.image, contestant.name);
+                ui.addImage(contestant.vote.image, contestant.vote.image);
+                ui.addParagraph(`${contestant.name} writes ${contestant.vote.name}'s name.`);
+            });
+
+            ui.addBoldParagraph(`The votes are in...`);
+            ui.addParagraph('After shuffling the votes, the person meeting their fate is...');
+
+            shuffleArray(votePool);
+
+            const nominee = votePool[0];
+            ui.addParagraph(`${nominee.name} has been chosen to be BURIED alive!`);
+
+            if (Math.random() < 0.5) {
+                ui.addImage(nominee.image, nominee.name, 'dead');
+                ui.addParagraph(`The houseguests carry out the grim task, ${nominee.name} has been BURIED alive...`);
+                const nomineeIndex = currentCast.findIndex(c => c.name === nominee.name);
+                currentCast.splice(nomineeIndex, 1);
+                deadCast.unshift(nominee);
+            } else {
+                ui.addImage(nominee.image, nominee.name);
+                ui.addParagraph(`Suddenly ${nominee.name} runs away! The houseguests catch them.`);
+
+                ui.addImage(nominee.image, nominee.name, 'dead');
+                ui.addParagraph(`The houseguests carry out the grim task, ${nominee.name} has been BURIED alive...`);
+                const nomineeIndex = currentCast.findIndex(c => c.name === nominee.name);
+                currentCast.splice(nomineeIndex, 1);
+                deadCast.unshift(nominee);
+            }
+
+            nominee.placementTexts.push('DEAD');
+            nominee.placementColors.push('#b22222');
+
+            const nonNominees = currentCast.filter(c => c.name !== nominee.name);
+            nonNominees.forEach(c => {
+                c.placementColors.push('white');
+                c.placementTexts.push('SAFE');
+            });
+            ui.addButton('Proceed', contestantProgress);
+        } else {
+            ui.addParagraph(`The houseguests must vote a contestant each...`);
+            currentCast.forEach(contestant => {
+                contestant.vote = worstRelationshipPair(contestant, currentCast);
+                votePool.push(contestant.vote);
+                ui.addImage(contestant.image, contestant.name);
+                ui.addImage(contestant.vote.image, contestant.vote.image);
+                ui.addParagraph(`${contestant.name} chooses ${contestant.vote.name}'s tarot card.`);
+            });
+
+            ui.addBoldParagraph(`The votes are in...`);
+            ui.addParagraph('After shuffling the votes, the first tarot card drawn is...');
+
+            shuffleArray(votePool);
 
 
-        const nominee1 = votePool[0];
-        nominee1.helper = null;
-        ui.addImage(nominee1.image, nominee1.name);
-        ui.addParagraph(`The first card drawn reveals ${nominee1.name}!`);
-
-        const remainingVotePool = votePool.slice(1);
-        const filteredVotePool = remainingVotePool.filter(contestant => contestant.name !== nominee1.name);
-
-        const nominee2 = filteredVotePool[0];
-        nominee2.helper = null;
-        ui.addImage(nominee2.image, nominee2.name);
-        ui.addParagraph(`The second card drawn reveals ${nominee2.name}!`);
-
-        deathNominees = [nominee1, nominee2];
-
-        if (Math.random() < 0.4) {
-            pairChallenge = true;
-
-            ui.addRow();
-            ui.addBoldParagraph('The nominees must pick a partner to help them in the challenge...');
-
-            const possibleHelpers = currentCast.filter(q => q.name !== nominee1.name && q.name !== nominee2.name);
-
-            const helper1 = bestRelationshipPair(nominee1, possibleHelpers);
-            nominee1.helper = helper1;
+            const nominee1 = votePool[0];
+            nominee1.helper = null;
             ui.addImage(nominee1.image, nominee1.name);
-            ui.addImage(helper1.image, helper1.name);
-            ui.addParagraph(`${nominee1.name} chooses ${helper1.name} as their partner.`);
+            ui.addParagraph(`The first card drawn reveals ${nominee1.name}!`);
 
-            const possibleHelpers2 = possibleHelpers.filter(q => q.name !== nominee1.helper.name);
+            const remainingVotePool = votePool.slice(1);
+            const filteredVotePool = remainingVotePool.filter(contestant => contestant.name !== nominee1.name);
 
-            const helper2 = bestRelationshipPair(nominee2, possibleHelpers2);
-            nominee2.helper = helper2;
+            const nominee2 = filteredVotePool[0];
+            nominee2.helper = null;
             ui.addImage(nominee2.image, nominee2.name);
-            ui.addImage(helper2.image, helper2.name);
-            ui.addParagraph(`${nominee2.name} chooses ${helper2.name} as their partner.`);
+            ui.addParagraph(`The second card drawn reveals ${nominee2.name}!`);
 
+            deathNominees = [nominee1, nominee2];
+
+            if (Math.random() < 0.25) {
+                pairChallenge = true;
+
+                ui.addRow();
+                ui.addBoldParagraph('The nominees must pick a partner to help them in the challenge...');
+
+                const possibleHelpers = currentCast.filter(contestant => contestant.name !== nominee1.name && contestant.name !== nominee2.name);
+
+                const helper1 = bestRelationshipPair(nominee1, possibleHelpers);
+                nominee1.helper = helper1;
+                ui.addImage(nominee1.image, nominee1.name);
+                ui.addImage(helper1.image, helper1.name);
+                ui.addParagraph(`${nominee1.name} chooses ${helper1.name} as their partner.`);
+
+                const possibleHelpers2 = possibleHelpers.filter(contestant => contestant.name !== nominee1.helper.name);
+
+                const helper2 = bestRelationshipPair(nominee2, possibleHelpers2);
+                nominee2.helper = helper2;
+                ui.addImage(nominee2.image, nominee2.name);
+                ui.addImage(helper2.image, helper2.name);
+                ui.addParagraph(`${nominee2.name} chooses ${helper2.name} as their partner.`);
+
+            }
+
+            const nonNominees = currentCast.filter(c => c.name !== nominee1.name && c.name !== nominee2.name);
+            nonNominees.forEach(c => {
+                c.placementColors.push('white');
+                c.placementTexts.push('SAFE');
+            });
+
+            ui.addButton('Proceed', finalDeathChallenge);
         }
-
-        const nonNominees = currentCast.filter(c => c.name !== nominee1.name && c.name !== nominee2.name);
-        nonNominees.forEach(c => {
-            c.placementColors.push('white');
-            c.placementTexts.push('SAFE');
-        });
-
-        ui.addButton('Proceed', finalDeathChallenge);
     }
 }
 
@@ -835,8 +894,6 @@ function startFinale() {
     ui.wipe();
     ui.addBoldParagraph(`Episode ${episodeNumber} - Finale`, 'episode-title');
     ui.addRow();
-
-    ui.addParagraph(`The remaining three houseguests dash towards the exit`);
 
     currentCast.forEach(contestant => {
         ui.addImage(contestant.image, contestant.name);
@@ -875,7 +932,7 @@ function finalDeathChallenge() {
     if (!pairChallenge) {
         if (Math.random() < 0.25 && !betrayalDeath) {
             betrayalDeath = true;
-            const nonNominees = currentCast.filter(q => !deathNominees.includes(q));
+            const nonNominees = currentCast.filter(contestant => !deathNominees.includes(contestant));
 
             ui.addBoldParagraph('The contestants are have both been spared and are safe');
             ui.addImage(deathNominees[0].image, deathNominees[0].name);
