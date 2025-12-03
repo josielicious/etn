@@ -903,7 +903,7 @@ function startFinale() {
     ui.addRow();
 
     if (finaleStretchLastEp) {
-        episodeNumber -= 1;
+        episodeNumber--;
     }
 
     currentCast.forEach(contestant => {
@@ -1148,7 +1148,7 @@ function contestantProgress() {
         row.appendChild(nameCell);
         row.appendChild(imageCell);
         row.appendChild(rolecell);
-        for (let i = 0; i < episodeNumber; i++) {
+        for (let i = 0; i < contestant.placementTexts.length; i++) {
             const statusCell = document.createElement('td');
             statusCell.innerHTML = contestant.placementTexts[i] || '';
             statusCell.style.color = 'black';
@@ -1170,7 +1170,7 @@ function contestantProgress() {
         row.appendChild(nameCell);
         row.appendChild(imageCell);
         row.appendChild(rolecell);
-        for (let i = 0; i < episodeNumber; i++) {
+        for (let i = 0; i < ontestant.placementTexts.length; i++) {
             const statusCell = document.createElement('td');
             statusCell.innerHTML = contestant.placementTexts[i] || '';
             statusCell.style.color = 'black';
