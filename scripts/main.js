@@ -498,7 +498,8 @@ const workActions = {
         'wanders around aimlessly, pretending to look busy',
         'has a mini breakdown and isolates themselves in the bathroom',
         'starts cleaning something, then immediately gives up',
-        'finds a sticky note and declares that it is a clue.'
+        'finds a sticky note and declares that it is a clue.',
+        'opens a box and says "I REBUKE YOU SATAN".'
     ],
     mediumLow: [
         'attempts to work but gets distracted by every small noise',
@@ -538,6 +539,7 @@ const discussionPrompts = [
     (a, b) => `${a} teaches ${b} a better way to search the house.`,
     (a, b) => `${a} accuses ${b} of hiding items to sabotage the group.`,
     (a, b) => `${a} and ${b} discover something together and freak out.`,
+    (a, b) => `${a} calls ${b} a beef jerky looking ass bitch`,
 ];
 
 function houseguestWorkPhase() {
@@ -1065,6 +1067,12 @@ function finalDeathChallenge() {
 
         const winnerNominee = team1Score > team2Score ? nominee1 : nominee2;
         const loserNominee = team1Score > team2Score ? nominee2 : nominee1;
+
+        if (Math.random() < 0.1) {
+            ui.addImage(winnerNominee.helper.image, winnerNominee.helper.name);
+            ui.addImage(loserNominee.image, loserNominee.name);
+            ui.addParagraph(`${winnerNominee.helper.name} cheated and sabotaged ${loserNominee.name}'s progress.`);
+        }
 
         //-- WINNER NARRATIVE --
 
