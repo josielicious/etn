@@ -467,7 +467,7 @@ if (document.location.pathname.includes("index.html")) {
         { name: 'The Prom Queen', gender: 'female' }
     ];
 
-    const usedRoles = [];
+    let usedRoles = [];
 
     function getRandomRole(gender = null) {
         let availableRoles = roleList.filter(role =>
