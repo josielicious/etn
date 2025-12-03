@@ -522,14 +522,17 @@ if (document.location.pathname.includes("index.html")) {
             'has a mini breakdown and isolates themselves in the bathroom',
             'starts cleaning something, then immediately gives up',
             'finds a sticky note and declares that it is a clue.',
-            'opens a box and says "I REBUKE YOU SATAN".'
+            'watched a bug die and exclaimed "it’s twerk dying!"'
         ],
         mediumLow: [
             'attempts to work but gets distracted by every small noise',
             'starts a task, then abandons it halfway for something else',
             'complains quietly about how exhausting everything is',
             'keeps asking others if they’re doing things correctly',
-            'tries organizing a drawer but ends up stuffing everything inside'
+            'tries organizing a drawer but ends up stuffing everything inside',
+            'the monster jump-scared blank from outside the window and they fell backwards, flipping the couch.',
+            'opens a box and says "I REBUKE YOU SATAN".',
+            'found a water puzzle and poured the water into the wrong hole'
         ],
         medium: [
             'does their assigned task with moderate efficiency',
@@ -563,6 +566,8 @@ if (document.location.pathname.includes("index.html")) {
         (a, b) => `${a} accuses ${b} of hiding items to sabotage the group.`,
         (a, b) => `${a} and ${b} discover something together and freak out.`,
         (a, b) => `${a} calls ${b} a beef jerky looking ass bitch`,
+        (a, b) => `${a} and ${b} participated and a spicy food challenge to receive a clue. When ${a} started failing, ${b} told them that "spitters are quitters."`,
+        (a, b) => `${a} and ${b} divvy up the next dead person's accounts. ${a} gets their Facebook and ${b} gets their Twitter`
     ];
 
     function houseguestWorkPhase() {
