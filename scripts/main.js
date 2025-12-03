@@ -414,7 +414,7 @@ const roleList = [
     { name: 'The Big Game Hunter', gender: 'male' },
     { name: 'The Hustler', gender: 'male' },
     { name: 'The Mobster', gender: 'male' },
-    { name: 'The Professor', gender: 'male' },
+    { name: 'The Professor', gender: 'both' },
     { name: 'The Heiress', gender: 'female' },
     { name: 'The Jazz Singer', gender: 'both' },
     { name: 'The Gambler', gender: 'both' },
