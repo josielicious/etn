@@ -569,7 +569,7 @@ if (document.location.pathname.includes("index.html")) {
         (a, b) => `${a} calls ${b} a beef jerky looking ass bitch`,
         (a, b) => `${a} and ${b} participated and a spicy food challenge to receive a clue. When ${a} started failing, ${b} told them that "spitters are quitters."`,
         (a, b) => `${a} and ${b} divvy up the next dead person's accounts. ${a} gets their Facebook and ${b} gets their Twitter`,
-        (a, b) => `${a} and ${b} se cearta peste hasbantul lu ${a}`
+        (a, b) => `${a} tries to form an alliance with ${b}, but is just called creepy.`
     ];
 
     function houseguestWorkPhase() {
@@ -682,7 +682,7 @@ if (document.location.pathname.includes("index.html")) {
             contestant.placementTexts.push(' ');
         });
 
-        if ((artifactsLeft == 0 && currentCast.length <= 3)) {
+        if (artifactsLeft == 0 && currentCast.length <= 3) {
             startFinale();
             return;
         }
