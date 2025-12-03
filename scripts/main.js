@@ -80,12 +80,23 @@ const PREDEFINED_CASTS = {
     'The Lost Tapes': [joeygraceffa, jojosiwa, mannymua, nikitadragun, rosannapansino, tanamongeau]
 };
 
-const allContestants = [
+const hardcodedContestants = [
     evagutowski, oliwhite, lelepons, timothydelaghetto, matthaag, sierrafurtado, glozellgreen, justineezarik, andreabrooks, shanedawson,
     andrearusset, alexwassabi, destormpower, gabbiehanna, jessewellens, laurenriihimaki, lizakoshy, tanamongeau, tyleroakley,
     colleenballinger, jccaylen, mannymua, matthewpatrick, nikitadragun, roifabito, rosannapansino, safiyanygaard, tealadunn,
     bretmanrock, jojosiwa, joeygraceffa
 ];
+
+function deserializeCustomGuests(customData) {
+    return customData.map(data => {
+        return new Contestant(data._name, data._image, data._gender);
+    });
+}
+
+const rawCustomData = loadCustomGuests();
+
+const customContestantInstances = deserializeCustomGuests(rawCustomData);
+const allContestants = hardcodedContestants.concat(customContestantInstances);
 
 // Cast Management //
 if (document.location.pathname.includes("index.html")) {
@@ -1244,15 +1255,13 @@ if (document.location.pathname.includes("index.html")) {
     }
 }
 
-const CUSTOM_GUESTS_KEY = 'etn_custom_guests';
-
 function loadCustomGuests() {
-    const data = localStorage.getItem(CUSTOM_GUESTS_KEY);
+    const data = localStorage.getItem('etn_custom_guests');
     return data ? JSON.parse(data) : [];
 }
 
 function saveCustomGuests(guests) {
-    localStorage.setItem(CUSTOM_GUESTS_KEY, JSON.stringify(guests));
+    localStorage.setItem('etn_custom_guests', JSON.stringify(guests));
 }
 
 if (document.location.pathname.includes("custom.html")) {
@@ -1325,7 +1334,7 @@ if (document.location.pathname.includes("custom.html")) {
 
     function clearCustomGuestsHandler() {
         if (confirm("Are you sure you want to clear ALL custom contestants? This cannot be undone.")) {
-            localStorage.removeItem(CUSTOM_GUESTS_KEY);
+            localStorage.removeItem(etn_custom_guests);
             renderCustomGuests();
             alert("All custom guests cleared.");
         }
