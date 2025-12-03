@@ -892,7 +892,7 @@ if (document.location.pathname.includes("index.html")) {
 
                 deathNominees = [nominee1, nominee2];
 
-                if (Math.random() < 0.25) {
+                if (Math.random() < 0.25 && currentCast.length >= 4) {
                     pairChallenge = true;
 
                     ui.addRow();
