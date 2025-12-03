@@ -1,6 +1,6 @@
 // Contestant Class Definition //
 class Contestant {
-    constructor(name, image, gender = 'Female') {
+    constructor(name, image, gender = 'female') {
         this._name = name;
         this._image = image;
         this._gender = gender;
@@ -30,44 +30,44 @@ class Contestant {
 }
 
 // Host //
-const joeygraceffa = new Contestant('Joey Graceffa', 'resources/images/contestants/TLT/joeygraceffa.webp', 'Male');
+const joeygraceffa = new Contestant('Joey Graceffa', 'resources/images/contestants/TLT/joeygraceffa.webp', 'male');
 
 // Season 1 Contestants //
 const andreabrooks = new Contestant('Andrea Brooks', 'resources/images/contestants/1/andreabrooks.webp');
 const evagutowski = new Contestant('Eva Gutowski', 'resources/images/contestants/1/evagutowski.webp');
 const glozellgreen = new Contestant('Glozell Green', 'resources/images/contestants/1/glozellgreen.webp');
 const lelepons = new Contestant('Lele Pons', 'resources/images/contestants/1/lelepons.webp');
-const matthaag = new Contestant('Matt Haag', 'resources/images/contestants/1/matthaag.webp', 'Male');
-const oliwhite = new Contestant('Oli White', 'resources/images/contestants/1/oliwhite.webp', 'Male');
-const shanedawson = new Contestant('Shane Dawson', 'resources/images/contestants/1/shanedawson.webp', 'Male');
+const matthaag = new Contestant('Matt Haag', 'resources/images/contestants/1/matthaag.webp', 'male');
+const oliwhite = new Contestant('Oli White', 'resources/images/contestants/1/oliwhite.webp', 'male');
+const shanedawson = new Contestant('Shane Dawson', 'resources/images/contestants/1/shanedawson.webp', 'male');
 const sierrafurtado = new Contestant('Sierra Furtado', 'resources/images/contestants/1/sierrafurtado.webp');
 
 // Season 2 Contestants //
 const andrearusset = new Contestant('Andrea Russet', 'resources/images/contestants/2/andrearusset.webp');
-const jessewellens = new Contestant('Jesse Wellens', 'resources/images/contestants/2/jessewellens.webp', 'Male');
+const jessewellens = new Contestant('Jesse Wellens', 'resources/images/contestants/2/jessewellens.webp', 'male');
 const laurenriihimaki = new Contestant('Lauren Riihimaki', 'resources/images/contestants/2/laurenriihimaki.webp');
 const lizakoshy = new Contestant('Liza Koshy', 'resources/images/contestants/2/lizakoshy.webp');
-const tyleroakley = new Contestant('Tyler Oakley', 'resources/images/contestants/2/tyleroakley.webp', 'Male');
+const tyleroakley = new Contestant('Tyler Oakley', 'resources/images/contestants/2/tyleroakley.webp', 'male');
 
 // Season 3 Contestants //
-const jccaylen = new Contestant('JC Caylen', 'resources/images/contestants/3/jccaylen.webp', 'Male');
-const matthewpatrick = new Contestant('Matthew Patrick', 'resources/images/contestants/3/matthewpatrick.webp', 'Male');
-const roifabito = new Contestant('Roi Fabito', 'resources/images/contestants/3/roifabito.webp', 'Male');
+const jccaylen = new Contestant('JC Caylen', 'resources/images/contestants/3/jccaylen.webp', 'male');
+const matthewpatrick = new Contestant('Matthew Patrick', 'resources/images/contestants/3/matthewpatrick.webp', 'male');
+const roifabito = new Contestant('Roi Fabito', 'resources/images/contestants/3/roifabito.webp', 'male');
 const safiyanygaard = new Contestant('Safiya Nygaard', 'resources/images/contestants/3/safiyanygaard.webp');
 const tealadunn = new Contestant('Teala Dunn', 'resources/images/contestants/3/tealadunn.webp');
 
 // Season 4 Contestants //
-const alexwassabi = new Contestant('Alex Wassabi', 'resources/images/contestants/4/alexwassabi.webp', 'Male');
-const bretmanrock = new Contestant('Bretman Rock', 'resources/images/contestants/4/bretmanrock.webp', 'Male');
+const alexwassabi = new Contestant('Alex Wassabi', 'resources/images/contestants/4/alexwassabi.webp', 'male');
+const bretmanrock = new Contestant('Bretman Rock', 'resources/images/contestants/4/bretmanrock.webp', 'male');
 const colleenballinger = new Contestant('Colleen Ballinger', 'resources/images/contestants/4/colleenballinger.webp');
-const destormpower = new Contestant('DeStorm Power', 'resources/images/contestants/4/destormpower.webp', 'Male');
+const destormpower = new Contestant('DeStorm Power', 'resources/images/contestants/4/destormpower.webp', 'male');
 const gabbiehanna = new Contestant('Gabbie Hanna', 'resources/images/contestants/4/gabbiehanna.webp');
 const justineezarik = new Contestant('Justine Ezarik', 'resources/images/contestants/4/justineezarik.webp');
-const timothydelaghetto = new Contestant('Timothy DeLaGhetto', 'resources/images/contestants/4/timothydelaghetto.webp', 'Male');
+const timothydelaghetto = new Contestant('Timothy DeLaGhetto', 'resources/images/contestants/4/timothydelaghetto.webp', 'male');
 
 // The Lost Tapes Contestants //
 const jojosiwa = new Contestant('Jojo Siwa', 'resources/images/contestants/TLT/jojosiwa.webp');
-const mannymua = new Contestant('Manny MUA', 'resources/images/contestants/TLT/mannymua.webp', 'Male');
+const mannymua = new Contestant('Manny MUA', 'resources/images/contestants/TLT/mannymua.webp', 'male');
 const nikitadragun = new Contestant('Nikita Dragun', 'resources/images/contestants/TLT/nikitadragun.webp');
 const rosannapansino = new Contestant('Rosanna Pansino', 'resources/images/contestants/TLT/rosannapansino.webp');
 const tanamongeau = new Contestant('Tana Mongeau', 'resources/images/contestants/TLT/tanamongeau.webp');
@@ -409,64 +409,70 @@ function resimulate() {
 }
 
 const roleList = [
-    'The Savant',
-    'The Journalist',
-    'The Big Game Hunter',
-    'The Hustler',
-    'The Mobster',
-    'The Professor',
-    'The Heiress',
-    'The Jazz Singer',
-    'The Gambler',
-    'The Fixer',
-    'The Renegade',
-    'The Mystic',
-    'The Thespian',
-    'The Novelist',
-    'The Vaudevillian',
-    'The Saloon Girl',
-    'The Explorer',
-    'The Railroad Tycoon',
-    'The Outlaw',
-    'The Engineer',
-    'The Detective',
-    'The Troublemaker',
-    'The Record Producer',
-    'The Jet-Setter',
-    'The Investigative Reporter',
-    'The Disco Dancer',
-    'The Super Spy',
-    'The Daredevil',
-    'The Hippie',
-    'The Duchess',
-    'The Playboy',
-    'The Socialite',
-    'The Aviator',
-    'The Hollywood Star',
-    'The Pin-Up Girl',
-    'The Enforcer',
-    'The Con Man',
-    'The Adventurer',
-    'The Glam Rocker',
-    'The Jock',
-    'The Fitness Instructor',
-    'The Burnout',
-    'The Prom Queen'
+    { name: 'The Savant', gender: 'both' },
+    { name: 'The Journalist', gender: 'both' },
+    { name: 'The Big Game Hunter', gender: 'male' },
+    { name: 'The Hustler', gender: 'male' },
+    { name: 'The Mobster', gender: 'male' },
+    { name: 'The Professor', gender: 'male' },
+    { name: 'The Heiress', gender: 'female' },
+    { name: 'The Jazz Singer', gender: 'both' },
+    { name: 'The Gambler', gender: 'both' },
+    { name: 'The Fixer', gender: 'both' },
+    { name: 'The Renegade', gender: 'both' },
+    { name: 'The Mystic', gender: 'both' },
+    { name: 'The Thespian', gender: 'both' },
+    { name: 'The Novelist', gender: 'both' },
+    { name: 'The Vaudevillian', gender: 'both' },
+    { name: 'The Saloon Girl', gender: 'female' },
+    { name: 'The Explorer', gender: 'both' },
+    { name: 'The Railroad Tycoon', gender: 'male' },
+    { name: 'The Outlaw', gender: 'both' },
+    { name: 'The Engineer', gender: 'male' },
+    { name: 'The Detective', gender: 'both' },
+    { name: 'The Troublemaker', gender: 'both' },
+    { name: 'The Record Producer', gender: 'male' },
+    { name: 'The Jet-Setter', gender: 'both' },
+    { name: 'The Investigative Reporter', gender: 'both' },
+    { name: 'The Disco Dancer', gender: 'both' },
+    { name: 'The Super Spy', gender: 'both' },
+    { name: 'The Daredevil', gender: 'both' },
+    { name: 'The Hippie', gender: 'both' },
+    { name: 'The Duchess', gender: 'female' },
+    { name: 'The Playboy', gender: 'male' },
+    { name: 'The Socialite', gender: 'female' },
+    { name: 'The Aviator', gender: 'both' },
+    { name: 'The Hollywood Star', gender: 'both' },
+    { name: 'The Pin-Up Girl', gender: 'female' },
+    { name: 'The Enforcer', gender: 'both' },
+    { name: 'The Con Man', gender: 'male' },
+    { name: 'The Adventurer', gender: 'both' },
+    { name: 'The Glam Rocker', gender: 'both' },
+    { name: 'The Jock', gender: 'male' },
+    { name: 'The Fitness Instructor', gender: 'both' },
+    { name: 'The Burnout', gender: 'both' },
+    { name: 'The Prom Queen', gender: 'female' }
 ];
 
 const usedRoles = [];
 
-function getRandomRole() {
-    const availableRoles = roleList.filter(role => !usedRoles.includes(role));
+function getRandomRole(gender = null) {
+    let availableRoles = roleList.filter(role =>
+        !usedRoles.includes(role.name) &&
+        (gender === null || role.gender === gender || role.gender === 'both')
+    );
+
     if (availableRoles.length === 0) {
-        usedRoles = 0;
-        availableRoles = roleList;
+        usedRoles = [];
+        availableRoles = roleList.filter(role =>
+            gender === null || role.gender === gender || role.gender === 'both'
+        );
     }
 
-    const selectedRole = availableRoles[Math.floor(Math.random() * availableRoles.length)];
-    usedRoles.push(selectedRole);
+    const selected = availableRoles[Math.floor(Math.random() * availableRoles.length)];
+    usedRoles.push(selected.name);
 
-    return selectedRole;
+    return selected.name;
 }
 
 function startEntranceSequence() {
