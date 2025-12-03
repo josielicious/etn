@@ -559,6 +559,7 @@ if (document.location.pathname.includes("index.html")) {
 
     const discussionPrompts = [
         (a, b) => `${a} and ${b} argue about who’s slacking the most.`,
+        (a, b) => `${a} admits to ${b} that they don't trust insurance people.`,
         (a, b) => `${a} and ${b} team up and start working together efficiently.`,
         (a, b) => `${a} vents to ${b} about the stress of living in the house.`,
         (a, b) => `${a} and ${b} get distracted chatting about last night’s drama.`,
