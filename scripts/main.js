@@ -379,6 +379,8 @@ function updateRelationship(contestantA, contestantB, scoreChange) {
 }
 
 function resimulate() {
+    finaleStretchLastEp = false;
+
     episodeNumber = 0;
 
     seasonOver = false;
@@ -619,6 +621,8 @@ function bestRelationshipPair(person, group) {
     return bestContestant;
 }
 
+let finaleStretchLastEp = false;
+
 let votePool = [];
 let deathNominees = [];
 
@@ -646,7 +650,7 @@ function newEpisode() {
         contestant.placementTexts.push(' ');
     });
 
-    if (artifactsLeft == 0) {
+    if ((artifactsLeft == 0 && currentCast.length <= 3)) {
         startFinale();
         return;
     }
@@ -708,8 +712,9 @@ function newEpisode() {
     houseguestWorkPhase();
 
     ui.addRow();
-    if (artifactsLeft == 1 && currentCast.length === 4 && Math.random() < 0.5) {
+    if ((artifactsLeft == 1 && currentCast.length === 4 && Math.random() < 0.5) || artifactsLeft == 0 && currentCast.length === 4) {
         ui.addBoldParagraph(`The guests find the last artifact.`);
+        artifactsLeft -= 1;
         if (Math.random() < 0.5) {
             const captured = currentCast[3];
 
@@ -732,6 +737,8 @@ function newEpisode() {
                 contestant.placementColors.push('tomato');
                 contestant.placementTexts.push('RACE');
             });
+
+            finaleStretchLastEp = true;
         } else {
             currentCast.forEach(contestant => {
                 contestant.workScore = Math.random() * 100;
@@ -895,9 +902,13 @@ function startFinale() {
     ui.addBoldParagraph(`Episode ${episodeNumber} - Finale`, 'episode-title');
     ui.addRow();
 
+    if (finaleStretchLastEp) {
+        episodeNumber -= 1;
+    }
+
     currentCast.forEach(contestant => {
         ui.addImage(contestant.image, contestant.name);
-        ui.addParagraph(`${contestant.name} has escaped the house`);
+        ui.addParagraph(`${contestant.name} has escaped the night...`);
 
         if (contestant.role === 'The Savant') {
             contestant.placementTexts.push('HOST');
@@ -1015,8 +1026,6 @@ function finalDeathChallenge() {
                     nominee.placementTexts.push('VOTE');
                     nominee.placementColors.push('hotpink');
                 });
-
-                artifactsLeft += 1;
             } else {
                 ui.addBoldParagraph('A contestant completes the challenge just in time...');
 
@@ -1119,6 +1128,10 @@ function contestantProgress() {
     for (let i = 1; i <= episodeNumber; i++) {
         const episodeHeader = document.createElement('th');
         episodeHeader.textContent = `Ep ${i} `;
+        if (i === episodeNumber && seasonOver && finaleStretchLastEp) {
+            episodeHeader.colSpan = 2;
+        }
+
         headerRow.appendChild(episodeHeader);
     }
     table.appendChild(headerRow);
