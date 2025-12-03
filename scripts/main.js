@@ -1339,7 +1339,7 @@ if (document.location.pathname.includes("custom.html")) {
 
     function clearCustomGuestsHandler() {
         if (confirm("Are you sure you want to clear ALL custom contestants? This cannot be undone.")) {
-            localStorage.removeItem(etn_custom_guests);
+            localStorage.removeItem('etn_custom_guests');
             renderCustomGuests();
             alert("All custom guests cleared.");
         }
