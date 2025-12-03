@@ -530,7 +530,7 @@ if (document.location.pathname.includes("index.html")) {
             'complains quietly about how exhausting everything is',
             'keeps asking others if they’re doing things correctly',
             'tries organizing a drawer but ends up stuffing everything inside',
-            'the monster jump-scared blank from outside the window and they fell backwards, flipping the couch.',
+            'gets jumpscared by the monster jump-scared blank from outside the window and they fell backwards, flipping the couch.',
             'opens a box and says "I REBUKE YOU SATAN".',
             'found a water puzzle and poured the water into the wrong hole'
         ],
@@ -568,7 +568,8 @@ if (document.location.pathname.includes("index.html")) {
         (a, b) => `${a} and ${b} discover something together and freak out.`,
         (a, b) => `${a} calls ${b} a beef jerky looking ass bitch`,
         (a, b) => `${a} and ${b} participated and a spicy food challenge to receive a clue. When ${a} started failing, ${b} told them that "spitters are quitters."`,
-        (a, b) => `${a} and ${b} divvy up the next dead person's accounts. ${a} gets their Facebook and ${b} gets their Twitter`
+        (a, b) => `${a} and ${b} divvy up the next dead person's accounts. ${a} gets their Facebook and ${b} gets their Twitter`,
+        (a, b) => `${a} and ${b} se cearta peste hasbantul lu ${a}`
     ];
 
     function houseguestWorkPhase() {
