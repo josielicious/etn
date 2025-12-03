@@ -682,7 +682,7 @@ if (document.location.pathname.includes("index.html")) {
             contestant.placementTexts.push(' ');
         });
 
-        if (artifactsLeft == 0 && currentCast.length <= 3) {
+        if (artifactsLeft <= 0 && currentCast.length <= 3) {
             startFinale();
             return;
         }
