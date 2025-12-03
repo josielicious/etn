@@ -15,7 +15,7 @@
 <body>
     <div id="container">
         <div id="simulator-notice">
-            <p>Simulate the "Escape the Night" season of your dreams.</p>
+            <p>Create and adjust your dream contestant to your liking.</p>
             <a href="index.html">
                 <p>Simulate Page</p>
             </a>
@@ -29,7 +29,24 @@
                 <p>Discord</p>
             </a>
         </div>
-        <p>BYEE SHE REALLY THOUGHT THERE'D BE CUSTOMS (not yet sorry lol im so tired)</p>
+        <div id="custom-controls">
+            <input type="text" id="c-name" placeholder="Name here..." required>
+            <br>
+            <input type="text" id="c-image" placeholder="Image URL here...">
+            <br>
+            <select id="c-gender" required>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+            </select>
+            <br>
+            <button id="create">Create Contestant</button>
+        </div>
+
+        <div id="custom-guests-display">
+            <h2>Your Custom Guests</h2>
+            <div id="castmates-list"></div>
+            <button id="clear-custom-guests">Clear All Custom Guests</button>
+        </div>
 </body>
 
 </html>
