@@ -724,6 +724,9 @@ if (document.location.pathname.includes("index.html")) {
                     currentCast.splice(poisonedContestantIndex, 1);
                     deadCast.unshift(poisonedContestant);
 
+                    poisonedContestant.placementColors.push('black');
+                    poisonedContestant.placementTexts.push('DEAD');
+
                     ui.addImage(hardestWorker.image, hardestWorker.name);
                     ui.addParagraph(`${hardestWorker.name} did the most work...`);
 
@@ -1211,8 +1214,12 @@ if (document.location.pathname.includes("index.html")) {
             for (let i = 0; i < contestant.placementTexts.length; i++) {
                 const statusCell = document.createElement('td');
                 statusCell.innerHTML = contestant.placementTexts[i] || '';
-                statusCell.style.color = 'black';
                 statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
+                if (contestant.placementColors[i] === 'black') {
+                    statusCell.style.color = 'white';
+                } else {
+                    statusCell.style.color = 'black';
+                }
                 row.appendChild(statusCell);
             }
             table.appendChild(row);
