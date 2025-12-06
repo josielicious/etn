@@ -759,18 +759,17 @@ if (document.location.pathname.includes("index.html")) {
                     return;
                 } else {
                     if (Math.random() < 0.4 || captureChallenge) {
-                        ui.addParagraph(`A sudden attack startles the houseguests! Someone is taken by the creature...`);
-
-                        const capturedContestantIndex = Math.floor(Math.random() * currentCast.length);
-                        const capturedContestant = currentCast[capturedContestantIndex];
-
-                        ui.addImage(capturedContestant.image, capturedContestant.name);
-                        ui.addBoldParagraph(`${capturedContestant.name} has been captured twice!`);
-                        ui.addParagraph(`The houseguests must work together to rescue them in time...`);
-
                         ui.addRow();
 
                         houseguestWorkPhase();
+
+                        ui.addRow();
+
+                        const hardestWorker = currentCast.sort((a, b) => b.workScore - a.workScore)[0];
+                        ui.addImage(hardestWorker.image, hardestWorker.name);
+                        ui.addParagraph(`${hardestWorker.name} manages to find an artifact!`);
+
+                        artifactsLeft -= 1;
 
                         ui.addRow();
 
@@ -782,46 +781,21 @@ if (document.location.pathname.includes("index.html")) {
                             .filter(c => c.name !== capturedContestant.name)
                             .sort((a, b) => b.workScore - a.workScore)[0];
 
-                        if (Math.random() < 0.5) {
-                            ui.addImage(capturedContestant.image, capturedContestant.name);
-                            ui.addParagraph(`The houseguests manage to find and free ${capturedContestant.name}!`);
+                        ui.addImage(capturedContestant.image, capturedContestant.name, 'dead');
+                        ui.addBoldParagraph(`${capturedContestant.name} has been captured twice!`);
+                        ui.addBoldParagraph(`${capturedContestant.name} is brutally murdered by the monster.`);
 
-                            updateRelationship(capturedContestant, strongestHelper, 3);
+                        currentCast.splice(capturedContestantIndex, 1);
+                        deadCast.unshift(capturedContestant);
 
-                            capturedContestant.placementColors.push('lightpink');
-                            capturedContestant.placementTexts.push('SAVE');
+                        capturedContestant.placementColors.push('black');
+                        capturedContestant.placementTexts.push('DEAD');
 
-                            ui.addImage(strongestHelper.image, strongestHelper.name);
-                            ui.addParagraph(`${strongestHelper.name} did the most work of the rescue effort!`);
-
-                            currentCast.forEach(c => {
-                                c.workScore = 0;
-                                c.placementColors.push('white');
-                                c.placementTexts.push('SAFE');
-                            });
-
-                            capturedContestant.placementColors.pop();
-                            capturedContestant.placementTexts.pop();
-
-                        } else {
-                            ui.addImage(capturedContestant.image, capturedContestant.name, 'dead');
-                            ui.addParagraph(`The rescue attempt failed... ${capturedContestant.name} has been killed...`);
-
-                            currentCast.splice(capturedContestantIndex, 1);
-                            deadCast.unshift(capturedContestant);
-
-                            capturedContestant.placementColors.push('black');
-                            capturedContestant.placementTexts.push('DEAD');
-
-                            ui.addImage(strongestHelper.image, strongestHelper.name);
-                            ui.addParagraph(`${strongestHelper.name} tried their best to save them...`);
-
-                            currentCast.forEach(c => {
-                                c.workScore = 0;
-                                c.placementColors.push('white');
-                                c.placementTexts.push('SAFE');
-                            });
-                        }
+                        currentCast.forEach(c => {
+                            c.workScore = 0;
+                            c.placementColors.push('white');
+                            c.placementTexts.push('SAFE');
+                        });
                     } else {
                         const trappedContestantsAmount = currentCast.length / 2;
                         const trappedContestants = [];
@@ -858,7 +832,6 @@ if (document.location.pathname.includes("index.html")) {
                             c.placementTexts.pop();
                         });
                     }
-                    artifactsLeft--;
                     ui.addButton('Proceed', contestantProgress);
                     return;
                 }
