@@ -1251,8 +1251,12 @@ if (document.location.pathname.includes("index.html")) {
             for (let i = 0; i < contestant.placementTexts.length; i++) {
                 const statusCell = document.createElement('td');
                 statusCell.innerHTML = contestant.placementTexts[i] || '';
-                statusCell.style.color = 'black';
                 statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
+                if (contestant.placementColors[i] == 'black' || contestant.placementColors[i] == '#deb887') {
+                    statusCell.style.color = 'white';
+                } else {
+                    statusCell.style.color = 'black';
+                }
                 row.appendChild(statusCell);
             }
             table.appendChild(row);
