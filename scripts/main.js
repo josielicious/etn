@@ -98,6 +98,16 @@ const rawCustomData = loadCustomGuests();
 const customContestantInstances = deserializeCustomGuests(rawCustomData);
 const allContestants = hardcodedContestants.concat(customContestantInstances);
 
+let finaleStretchLastEp = false;
+
+let votePool = [];
+let deathNominees = [];
+
+let rigIregPrem = false;
+let captureChallenge = false;
+let burialHappened = false;
+let pairChallenge = false;
+
 // Cast Management //
 if (document.location.pathname.includes("index.html")) {
     const castmatesList = document.getElementById('castmates-list');
@@ -653,15 +663,6 @@ if (document.location.pathname.includes("index.html")) {
         return bestContestant;
     }
 
-    let finaleStretchLastEp = false;
-
-    let votePool = [];
-    let deathNominees = [];
-
-    let captureChallenge = false;
-    let burialHappened = false;
-    let pairChallenge = false;
-
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -695,8 +696,8 @@ if (document.location.pathname.includes("index.html")) {
 
         if (episodeNumber === 1) {
             ui.addParagraph("The houseguests are settling in and getting to know each other...");
-            if (Math.random() < 0.5) {
-                if (Math.random() < 0.1 && currentCast.length > 10) {
+            if (Math.random() < 0.5 || rigIregPrem) {
+                if (Math.random() < 0.3 && !captureChallenge) {
                     const poisonedContestantIndex = Math.floor(Math.random() * currentCast.length);
                     const poisonedContestant = currentCast[poisonedContestantIndex];
 
@@ -757,41 +758,107 @@ if (document.location.pathname.includes("index.html")) {
                     ui.addButton('Proceed', contestantProgress);
                     return;
                 } else {
-                    const trappedContestantsAmount = currentCast.length / 2;
-                    const trappedContestants = [];
+                    if (Math.random() < 0.4 || captureChallenge) {
+                        ui.addParagraph(`A sudden attack startles the houseguests! Someone is taken by the creature...`);
 
-                    let availableContestants = [...currentCast];
-                    for (let i = 0; i < trappedContestantsAmount; i++) {
-                        const random = Math.floor(Math.random() * availableContestants.length);
-                        trappedContestants.push(availableContestants[random]);
-                        availableContestants.splice(random, 1);
+                        const capturedContestantIndex = Math.floor(Math.random() * currentCast.length);
+                        const capturedContestant = currentCast[capturedContestantIndex];
+
+                        ui.addImage(capturedContestant.image, capturedContestant.name);
+                        ui.addBoldParagraph(`${capturedContestant.name} has been captured twice!`);
+                        ui.addParagraph(`The houseguests must work together to rescue them in time...`);
+
+                        ui.addRow();
+
+                        houseguestWorkPhase();
+
+                        ui.addRow();
+
+                        currentCast.forEach(c => {
+                            if (c.name !== capturedContestant.name) c.workScore = Math.random() * 100;
+                        });
+
+                        const strongestHelper = currentCast
+                            .filter(c => c.name !== capturedContestant.name)
+                            .sort((a, b) => b.workScore - a.workScore)[0];
+
+                        if (Math.random() < 0.5) {
+                            ui.addImage(capturedContestant.image, capturedContestant.name);
+                            ui.addParagraph(`The houseguests manage to find and free ${capturedContestant.name}!`);
+
+                            updateRelationship(capturedContestant, strongestHelper, 3);
+
+                            capturedContestant.placementColors.push('lightpink');
+                            capturedContestant.placementTexts.push('SAVE');
+
+                            ui.addImage(strongestHelper.image, strongestHelper.name);
+                            ui.addParagraph(`${strongestHelper.name} did the most work of the rescue effort!`);
+
+                            currentCast.forEach(c => {
+                                c.workScore = 0;
+                                c.placementColors.push('white');
+                                c.placementTexts.push('SAFE');
+                            });
+
+                            capturedContestant.placementColors.pop();
+                            capturedContestant.placementTexts.pop();
+
+                        } else {
+                            ui.addImage(capturedContestant.image, capturedContestant.name, 'dead');
+                            ui.addParagraph(`The rescue attempt failed... ${capturedContestant.name} has been killed...`);
+
+                            currentCast.splice(capturedContestantIndex, 1);
+                            deadCast.unshift(capturedContestant);
+
+                            capturedContestant.placementColors.push('black');
+                            capturedContestant.placementTexts.push('DEAD');
+
+                            ui.addImage(strongestHelper.image, strongestHelper.name);
+                            ui.addParagraph(`${strongestHelper.name} tried their best to save them...`);
+
+                            currentCast.forEach(c => {
+                                c.workScore = 0;
+                                c.placementColors.push('white');
+                                c.placementTexts.push('SAFE');
+                            });
+                        }
+                    } else {
+                        const trappedContestantsAmount = currentCast.length / 2;
+                        const trappedContestants = [];
+
+                        let availableContestants = [...currentCast];
+                        for (let i = 0; i < trappedContestantsAmount; i++) {
+                            const random = Math.floor(Math.random() * availableContestants.length);
+                            trappedContestants.push(availableContestants[random]);
+                            availableContestants.splice(random, 1);
+                        }
+
+                        trappedContestants.forEach(c => {
+                            ui.addImage(c.image, c.alt);
+                        });
+                        ui.addBoldParagraph(`${trappedContestants.map(c => c.name).join(", ")} have been trapped and captured by a group of monsters.`);
+
+                        ui.addRow();
+                        houseguestWorkPhase();
+                        ui.addRow();
+
+                        trappedContestants.forEach(c => {
+                            ui.addImage(c.image, c.alt);
+                            c.placementColors.push('#deb887');
+                            c.placementTexts.push('SAFE');
+                        });
+                        ui.addBoldParagraph(`${trappedContestants.map(c => c.name).join(", ")} have been found and rescued!`);
+                        currentCast.forEach(c => {
+                            c.workScore = 0;
+                            c.placementColors.push('white');
+                            c.placementTexts.push('SAFE');
+                        });
+                        trappedContestants.forEach(c => {
+                            c.placementColors.pop();
+                            c.placementTexts.pop();
+                        });
                     }
-
-                    trappedContestants.forEach(c => {
-                        ui.addImage(c.image, c.alt);
-                    });
-                    ui.addBoldParagraph(`${trappedContestants.map(c => c.name).join(", ")} have been trapped and captured by a group of monsters.`);
-
-                    ui.addRow();
-                    houseguestWorkPhase();
-                    ui.addRow();
-
-                    trappedContestants.forEach(c => {
-                        ui.addImage(c.image, c.alt);
-                        c.placementColors.push('#deb887');
-                        c.placementTexts.push('SAFE');
-                    });
-                    ui.addBoldParagraph(`${trappedContestants.map(c => c.name).join(", ")} have been found and rescued!`);
-                    currentCast.forEach(c => {
-                        c.workScore = 0;
-                        c.placementColors.push('white');
-                        c.placementTexts.push('SAFE');
-                    });
-                    trappedContestants.forEach(c => {
-                        c.placementColors.pop();
-                        c.placementTexts.pop();
-                    });
-                    currentCast.forEach
+                    artifactsLeft--;
                     ui.addButton('Proceed', contestantProgress);
                     return;
                 }
