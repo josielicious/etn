@@ -765,6 +765,10 @@ if (document.location.pathname.includes("index.html")) {
 
                         ui.addRow();
 
+                        currentCast.forEach(c => {
+                            c.workScore = Math.random() * 100;
+                        });
+
                         const hardestWorker = currentCast.sort((a, b) => b.workScore - a.workScore)[0];
                         ui.addImage(hardestWorker.image, hardestWorker.name);
                         ui.addParagraph(`${hardestWorker.name} manages to find an artifact!`);
@@ -773,13 +777,8 @@ if (document.location.pathname.includes("index.html")) {
 
                         ui.addRow();
 
-                        currentCast.forEach(c => {
-                            if (c.name !== capturedContestant.name) c.workScore = Math.random() * 100;
-                        });
-
-                        const strongestHelper = currentCast
-                            .filter(c => c.name !== capturedContestant.name)
-                            .sort((a, b) => b.workScore - a.workScore)[0];
+                        const capturedContestant = currentCast[Math.floor(Math.random() * currentCast.length)];
+                        const capturedContestantIndex = currentCast.indexOf(capturedContestant);
 
                         ui.addImage(capturedContestant.image, capturedContestant.name, 'dead');
                         ui.addBoldParagraph(`${capturedContestant.name} has been captured twice!`);
