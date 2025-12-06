@@ -695,47 +695,106 @@ if (document.location.pathname.includes("index.html")) {
 
         if (episodeNumber === 1) {
             ui.addParagraph("The houseguests are settling in and getting to know each other...");
-            if (Math.random() < 0.1 && currentCast.length > 10) {
-                const poisonedContestantIndex = Math.floor(Math.random() * currentCast.length);
-                const poisonedContestant = currentCast[poisonedContestantIndex];
+            if (Math.random() < 0.5) {
+                if (Math.random() < 0.1 && currentCast.length > 10) {
+                    const poisonedContestantIndex = Math.floor(Math.random() * currentCast.length);
+                    const poisonedContestant = currentCast[poisonedContestantIndex];
 
-                const nonPoisonedContestants = currentCast.filter(c => c.name !== poisonedContestant.name);
-                nonPoisonedContestants.forEach(c => {
-                    c.workScore = Math.random() * 100;
-                });
-                const hardestWorker = nonPoisonedContestants.sort((a, b) => b.workScore - a.workScore)[0];
+                    const nonPoisonedContestants = currentCast.filter(c => c.name !== poisonedContestant.name);
+                    nonPoisonedContestants.forEach(c => {
+                        c.workScore = Math.random() * 100;
+                    });
+                    const hardestWorker = nonPoisonedContestants.sort((a, b) => b.workScore - a.workScore)[0];
 
-                ui.addImage(poisonedContestant.image, poisonedContestant.name);
-                ui.addParagraph(`Oh no! ${poisonedContestant.name} has been poisoned...`);
-                ui.addBoldParagraph(`The rest of the houseguests must find the antidote before it's too late!`);
-
-                if (Math.random() < 0.5) {
                     ui.addImage(poisonedContestant.image, poisonedContestant.name);
-                    ui.addParagraph(`Luckily, the houseguests found the antidote in time! ${poisonedContestant.name} has been cured!`);
+                    ui.addParagraph(`Oh no! ${poisonedContestant.name} has been poisoned...`);
+                    ui.addBoldParagraph(`The rest of the houseguests must find the antidote before it's too late!`);
 
-                    updateRelationship(poisonedContestant, hardestWorker, 3);
+                    ui.addRow();
+                    houseguestWorkPhase();
+                    ui.addRow();
 
-                    ui.addImage(hardestWorker.image, hardestWorker.name);
-                    ui.addImage(poisonedContestant.image, poisonedContestant.name);
-                    ui.addParagraph(`${hardestWorker.name}'s efforts earned ${poisonedContestant.name}'s gratitude!`);
+                    if (Math.random() < 0.5) {
+                        ui.addImage(poisonedContestant.image, poisonedContestant.name);
+                        ui.addParagraph(`Luckily, the houseguests found the antidote in time! ${poisonedContestant.name} has been cured!`);
+
+                        updateRelationship(poisonedContestant, hardestWorker, 3);
+
+                        poisonedContestant.placementColors.push('lightpink');
+                        poisonedContestant.placementTexts.push('SAVE');
+
+                        ui.addImage(hardestWorker.image, hardestWorker.name);
+                        ui.addImage(poisonedContestant.image, poisonedContestant.name);
+                        ui.addParagraph(`${hardestWorker.name}'s efforts earned ${poisonedContestant.name}'s gratitude!`);
+
+                        currentCast.forEach(c => {
+                            c.workScore = 0;
+                            c.placementColors.push('white');
+                            c.placementTexts.push('SAFE');
+                        });
+
+                        poisonedContestant.placementColors.pop();
+                        poisonedContestant.placementTexts.pop();
+                    } else {
+                        ui.addImage(poisonedContestant.image, poisonedContestant.name, 'dead');
+                        ui.addParagraph(`Unfortunately, the houseguests couldn't find the antidote in time. ${poisonedContestant.name} has been died...`);
+                        currentCast.splice(poisonedContestantIndex, 1);
+                        deadCast.unshift(poisonedContestant);
+
+                        poisonedContestant.placementColors.push('black');
+                        poisonedContestant.placementTexts.push('DEAD');
+
+                        ui.addImage(hardestWorker.image, hardestWorker.name);
+                        ui.addParagraph(`${hardestWorker.name} did the most work...`);
+
+                        currentCast.forEach(c => {
+                            c.workScore = 0;
+                            c.placementColors.push('white');
+                            c.placementTexts.push('SAFE');
+                        });
+                    }
+
+                    ui.addButton('Proceed', contestantProgress);
+                    return;
                 } else {
-                    ui.addImage(poisonedContestant.image, poisonedContestant.name, 'dead');
-                    ui.addParagraph(`Unfortunately, the houseguests couldn't find the antidote in time. ${poisonedContestant.name} has been died...`);
-                    currentCast.splice(poisonedContestantIndex, 1);
-                    deadCast.unshift(poisonedContestant);
+                    const trappedContestantsAmount = currentCast.length / 2;
+                    const trappedContestants = [];
 
-                    poisonedContestant.placementColors.push('black');
-                    poisonedContestant.placementTexts.push('DEAD');
+                    let availableContestants = [...currentCast];
+                    for (let i = 0; i < trappedContestantsAmount; i++) {
+                        const random = Math.floor(Math.random() * availableContestants.length);
+                        trappedContestants.push(availableContestants[random]);
+                        availableContestants.splice(random, 1);
+                    }
 
-                    ui.addImage(hardestWorker.image, hardestWorker.name);
-                    ui.addParagraph(`${hardestWorker.name} did the most work...`);
+                    trappedContestants.forEach(c => {
+                        ui.addImage(c.image, c.alt);
+                    });
+                    ui.addBoldParagraph(`${trappedContestants.map(c => c.name).join(", ")} have been trapped and captured by a group of monsters.`);
 
+                    ui.addRow();
+                    houseguestWorkPhase();
+                    ui.addRow();
+
+                    trappedContestants.forEach(c => {
+                        ui.addImage(c.image, c.alt);
+                        c.placementColors.push('#deb887');
+                        c.placementTexts.push('SAFE');
+                    });
+                    ui.addBoldParagraph(`${trappedContestants.map(c => c.name).join(", ")} have been found and rescued!`);
                     currentCast.forEach(c => {
                         c.workScore = 0;
+                        c.placementColors.push('white');
+                        c.placementTexts.push('SAFE');
                     });
+                    trappedContestants.forEach(c => {
+                        c.placementColors.pop();
+                        c.placementTexts.pop();
+                    });
+                    currentCast.forEach
+                    ui.addButton('Proceed', contestantProgress);
+                    return;
                 }
-                ui.addParagraph(`The guests find out the must find ${artifactsLeft} artifacts to survive...`);
-                ui.addBoldParagraph(`For each artifact found, they must cleanse it, in exchange for a human life...`);
             } else {
                 ui.addParagraph(`The guests find out the must find ${artifactsLeft} artifacts to survive...`);
                 ui.addBoldParagraph(`For each artifact found, they must cleanse it, in exchange for a human life...`);
@@ -1215,7 +1274,7 @@ if (document.location.pathname.includes("index.html")) {
                 const statusCell = document.createElement('td');
                 statusCell.innerHTML = contestant.placementTexts[i] || '';
                 statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
-                if (contestant.placementColors[i] === 'black') {
+                if (contestant.placementColors[i] == 'black' || contestant.placementColors[i] == '#deb887') {
                     statusCell.style.color = 'white';
                 } else {
                     statusCell.style.color = 'black';
