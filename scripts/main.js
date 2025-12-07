@@ -5,7 +5,7 @@ class Contestant {
         this._image = image;
         this._gender = gender;
 
-        this.role = 'The Savant';
+        this.role = '';
         this.helper = null;
 
         this.placementTexts = [];
@@ -129,6 +129,54 @@ let betrayalDeath = false;
 
 let doubleDeath = false;
 let doubleLive = false;
+
+const roleList = [
+    { name: 'The Savant', gender: 'both' },
+    { name: 'The Journalist', gender: 'both' },
+    { name: 'The Big Game Hunter', gender: 'male' },
+    { name: 'The Hustler', gender: 'male' },
+    { name: 'The Mobster', gender: 'male' },
+    { name: 'The Professor', gender: 'both' },
+    { name: 'The Heiress', gender: 'female' },
+    { name: 'The Jazz Singer', gender: 'both' },
+    { name: 'The Gambler', gender: 'both' },
+    { name: 'The Fixer', gender: 'both' },
+    { name: 'The Renegade', gender: 'both' },
+    { name: 'The Mystic', gender: 'both' },
+    { name: 'The Thespian', gender: 'both' },
+    { name: 'The Novelist', gender: 'both' },
+    { name: 'The Vaudevillian', gender: 'both' },
+    { name: 'The Saloon Girl', gender: 'female' },
+    { name: 'The Explorer', gender: 'both' },
+    { name: 'The Railroad Tycoon', gender: 'male' },
+    { name: 'The Outlaw', gender: 'both' },
+    { name: 'The Engineer', gender: 'male' },
+    { name: 'The Detective', gender: 'both' },
+    { name: 'The Troublemaker', gender: 'both' },
+    { name: 'The Record Producer', gender: 'male' },
+    { name: 'The Jet-Setter', gender: 'both' },
+    { name: 'The Investigative Reporter', gender: 'both' },
+    { name: 'The Disco Dancer', gender: 'both' },
+    { name: 'The Super Spy', gender: 'both' },
+    { name: 'The Daredevil', gender: 'both' },
+    { name: 'The Hippie', gender: 'both' },
+    { name: 'The Duchess', gender: 'female' },
+    { name: 'The Playboy', gender: 'male' },
+    { name: 'The Socialite', gender: 'female' },
+    { name: 'The Aviator', gender: 'both' },
+    { name: 'The Hollywood Star', gender: 'both' },
+    { name: 'The Pin-Up Girl', gender: 'female' },
+    { name: 'The Enforcer', gender: 'both' },
+    { name: 'The Con Man', gender: 'male' },
+    { name: 'The Adventurer', gender: 'both' },
+    { name: 'The Glam Rocker', gender: 'both' },
+    { name: 'The Jock', gender: 'male' },
+    { name: 'The Fitness Instructor', gender: 'both' },
+    { name: 'The Burnout', gender: 'both' },
+    { name: 'The Prom Queen', gender: 'female' }
+];
+
+let usedRoles = [];
 
 // Cast Management //
 if (document.location.pathname.includes("index.html")) {
@@ -342,12 +390,108 @@ if (document.location.pathname.includes("index.html")) {
 
         checkAndApplyModifiers();
 
-        startEntranceSequence();
+        if (chooseRoles) {
+            chooseRolesCustom();
+        } else {
+            startEntranceSequence();
+        }
+    }
+
+    function chooseRolesCustom() {
+        const container = document.getElementById('container');
+
+        container.innerHTML = '<h2>Assign Roles to Your Cast</h2>';
+
+        const assignmentForm = document.createElement('div');
+        assignmentForm.id = 'cast-container';
+        container.appendChild(assignmentForm);
+
+        const allRoles = roleList;
+
+        currentCast.forEach(castmate => {
+            const castmateDiv = document.createElement('div');
+            castmateDiv.className = 'member-container';
+            castmateDiv.setAttribute('data-id', castmate.name);
+
+            const img = document.createElement('img');
+            img.src = castmate.image;
+            img.style.width = '100px';
+            img.style.height = '100px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '50%';
+            img.style.border = '2px solid #be9871';
+            img.style.margin = '5px';
+            img.alt = castmate.name;
+            castmateDiv.appendChild(img);
+
+            const nameBold = document.createElement('b');
+            nameBold.textContent = castmate.name;
+            castmateDiv.appendChild(nameBold);
+
+            const select = document.createElement('select');
+            select.id = `role-select-${castmate.name}`;
+            select.className = 'role-selector';
+
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "--- Select Role ---";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            select.appendChild(defaultOption);
+
+            allRoles.forEach(role => {
+                if (castmate.gender === 'both' || role.gender === 'both' || castmate.gender === role.gender) {
+                    const option = document.createElement('option');
+                    option.value = role.name;
+                    option.textContent = role.name;
+                    select.appendChild(option);
+                }
+            });
+
+            castmateDiv.appendChild(select);
+            assignmentForm.appendChild(castmateDiv);
+        });
+
+        const confirmButton = document.createElement('button');
+        confirmButton.id = 'confirm-roles-button';
+        confirmButton.textContent = 'Confirm Roles and Start Simulation';
+        confirmButton.addEventListener('click', assignSelectedRoles);
+        container.appendChild(confirmButton);
+    }
+
+    function assignSelectedRoles() {
+        let allAssigned = true;
+        let selectedRoles = [];
+
+        currentCast.forEach(castmate => {
+            const selectElement = document.getElementById(`role-select-${castmate.name}`);
+
+            if (selectElement) {
+                const selectedRole = selectElement.value;
+
+                if (selectedRole && selectedRole !== "") {
+                    castmate.role = selectedRole;
+                    selectedRoles.push(selectedRole);
+                } else {
+                    allAssigned = false;
+                }
+            }
+        });
+
+        if (!allAssigned) {
+            alert("Please assign a role to every castmate before continuing.");
+        } else {
+            console.log("Roles assigned:", currentCast.map(c => ({ name: c.name, role: c.role })));
+            startEntranceSequence();
+        }
     }
 
     function checkAndApplyModifiers() {
         const hiddenVotesCheckbox = document.getElementById('hidden-votes-checkbox');
-        hiddenVotes = hiddenVotesCheckbox.checked;
+        if (hiddenVotesCheckbox) hiddenVotes = hiddenVotesCheckbox.checked;
+
+        const chooseRolesCheckbox = document.getElementById('choose-roles-checkbox');
+        if (chooseRolesCheckbox) chooseRoles = chooseRolesCheckbox.checked;
     }
 
     // UI Class //
@@ -492,54 +636,6 @@ if (document.location.pathname.includes("index.html")) {
         startSimulation();
     }
 
-    const roleList = [
-        { name: 'The Savant', gender: 'both' },
-        { name: 'The Journalist', gender: 'both' },
-        { name: 'The Big Game Hunter', gender: 'male' },
-        { name: 'The Hustler', gender: 'male' },
-        { name: 'The Mobster', gender: 'male' },
-        { name: 'The Professor', gender: 'both' },
-        { name: 'The Heiress', gender: 'female' },
-        { name: 'The Jazz Singer', gender: 'both' },
-        { name: 'The Gambler', gender: 'both' },
-        { name: 'The Fixer', gender: 'both' },
-        { name: 'The Renegade', gender: 'both' },
-        { name: 'The Mystic', gender: 'both' },
-        { name: 'The Thespian', gender: 'both' },
-        { name: 'The Novelist', gender: 'both' },
-        { name: 'The Vaudevillian', gender: 'both' },
-        { name: 'The Saloon Girl', gender: 'female' },
-        { name: 'The Explorer', gender: 'both' },
-        { name: 'The Railroad Tycoon', gender: 'male' },
-        { name: 'The Outlaw', gender: 'both' },
-        { name: 'The Engineer', gender: 'male' },
-        { name: 'The Detective', gender: 'both' },
-        { name: 'The Troublemaker', gender: 'both' },
-        { name: 'The Record Producer', gender: 'male' },
-        { name: 'The Jet-Setter', gender: 'both' },
-        { name: 'The Investigative Reporter', gender: 'both' },
-        { name: 'The Disco Dancer', gender: 'both' },
-        { name: 'The Super Spy', gender: 'both' },
-        { name: 'The Daredevil', gender: 'both' },
-        { name: 'The Hippie', gender: 'both' },
-        { name: 'The Duchess', gender: 'female' },
-        { name: 'The Playboy', gender: 'male' },
-        { name: 'The Socialite', gender: 'female' },
-        { name: 'The Aviator', gender: 'both' },
-        { name: 'The Hollywood Star', gender: 'both' },
-        { name: 'The Pin-Up Girl', gender: 'female' },
-        { name: 'The Enforcer', gender: 'both' },
-        { name: 'The Con Man', gender: 'male' },
-        { name: 'The Adventurer', gender: 'both' },
-        { name: 'The Glam Rocker', gender: 'both' },
-        { name: 'The Jock', gender: 'male' },
-        { name: 'The Fitness Instructor', gender: 'both' },
-        { name: 'The Burnout', gender: 'both' },
-        { name: 'The Prom Queen', gender: 'female' }
-    ];
-
-    let usedRoles = [];
-
     function getRandomRole(gender = null) {
         let availableRoles = roleList.filter(role =>
             !usedRoles.includes(role.name) &&
@@ -569,12 +665,13 @@ if (document.location.pathname.includes("index.html")) {
         ui.addRow();
 
         currentCast.forEach((contestant, index) => {
-            if (Math.random < 0.5) {
-                contestant.role = getRandomRole('both');
-            } else {
-                contestant.role = getRandomRole(contestant.gender);
+            if (contestant.role == '') {
+                if (Math.random < 0.5) {
+                    contestant.role = getRandomRole('both');
+                } else {
+                    contestant.role = getRandomRole(contestant.gender);
+                }
             }
-
             ui.addImage(contestant.image, contestant.name);
             ui.addBoldParagraph(`${contestant.name} - ${contestant.role}`);
             ui.addParagraph(`${contestant.name} has entered the house!`);
