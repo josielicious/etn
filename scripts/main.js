@@ -11,6 +11,8 @@ class Contestant {
         this.placementTexts = [];
         this.placementColors = [];
 
+        this.votingHistory = [];
+
         this.workScore = 0;
 
         this.relationships = {};
@@ -26,6 +28,14 @@ class Contestant {
 
     get gender() {
         return this._gender;
+    }
+
+    recordVote(episodeNum, targetContestant) {
+        console.log(`${this.name} has voted for ${targetContestant.name} on episode ${episodeNum}`)
+        this.votingHistory.push({
+            episode: episodeNum,
+            target: targetContestant.name
+        });
     }
 }
 
@@ -922,6 +932,7 @@ if (document.location.pathname.includes("index.html")) {
                 ui.addParagraph(`A contestant must be BURRIED alive in order to cleanse the artifact...`);
                 currentCast.forEach(contestant => {
                     contestant.vote = worstRelationshipPair(contestant, currentCast);
+                    contestant.recordVote(episodeNumber, contestant.vote);
                     votePool.push(contestant.vote);
                     ui.addImage(contestant.image, contestant.name);
                     ui.addImage(contestant.vote.image, contestant.vote.image);
@@ -966,6 +977,7 @@ if (document.location.pathname.includes("index.html")) {
                 ui.addParagraph(`The houseguests must vote a contestant each...`);
                 currentCast.forEach(contestant => {
                     contestant.vote = worstRelationshipPair(contestant, currentCast);
+                    contestant.recordVote(episodeNumber, contestant.vote);
                     votePool.push(contestant.vote);
                     ui.addImage(contestant.image, contestant.name);
                     ui.addImage(contestant.vote.image, contestant.vote.image);
@@ -1245,6 +1257,73 @@ if (document.location.pathname.includes("index.html")) {
         ui.addButton('Proceed', contestantProgress);
     }
 
+    function createContestantRow(table, contestant) {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        nameCell.textContent = contestant.name;
+        const imageCell = document.createElement('td');
+        imageCell.style.backgroundImage = `url(${contestant.image})`;
+        imageCell.style.backgroundSize = 'cover';
+        const rolecell = document.createElement('td');
+        rolecell.textContent = contestant.role;
+        row.appendChild(nameCell);
+        row.appendChild(imageCell);
+        row.appendChild(rolecell);
+        for (let i = 0; i < contestant.placementTexts.length; i++) {
+            const statusCell = document.createElement('td');
+            statusCell.innerHTML = contestant.placementTexts[i] || '';
+            statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
+            if (contestant.placementColors[i] == 'black' || contestant.placementColors[i] == '#deb887') {
+                statusCell.style.color = 'white';
+            } else {
+                statusCell.style.color = 'black';
+            }
+            row.appendChild(statusCell);
+        }
+        table.appendChild(row);
+    }
+
+    function createVoteContestantRow(table, contestant) {
+        const row = document.createElement('tr');
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = contestant.name;
+        row.appendChild(nameCell);
+
+        for (let ep = 1; ep <= episodeNumber; ep++) {
+            const statusCell = document.createElement('td');
+
+            const voteRecord = contestant.votingHistory.find(v => v.episode === ep);
+
+            if (voteRecord) {
+                const firstName = voteRecord.target.split(' ')[0];
+                statusCell.textContent = firstName;
+            } else {
+                statusCell.textContent = '-';
+            }
+
+            const color = contestant.placementColors[ep - 1] || '';
+
+            if (color) {
+                statusCell.style.backgroundColor = color;
+                if (color === 'black' || color === '#000000' || color === '#deb887') {
+                    statusCell.style.color = 'white';
+                } else {
+                    if (color == 'lightgray') {
+                        statusCell.style.color = 'lightgray';
+                    } else {
+                        statusCell.style.color = 'black';
+                    }
+                }
+            }
+
+            row.appendChild(statusCell);
+        }
+
+        table.appendChild(row);
+    }
+
+
     function contestantProgress() {
         ui.wipe();
         ui.addBoldParagraph('Contestant Progress', 'episode-title');
@@ -1266,7 +1345,7 @@ if (document.location.pathname.includes("index.html")) {
         headerRow.appendChild(nameHeader3);
         for (let i = 1; i <= episodeNumber; i++) {
             const episodeHeader = document.createElement('th');
-            episodeHeader.textContent = `Ep ${i} `;
+            episodeHeader.textContent = `Ep. ${i} `;
             if (i === episodeNumber && seasonOver && finaleStretchLastEp) {
                 episodeHeader.colSpan = 2;
             }
@@ -1276,55 +1355,11 @@ if (document.location.pathname.includes("index.html")) {
         table.appendChild(headerRow);
 
         currentCast.forEach(contestant => {
-            const row = document.createElement('tr');
-            const nameCell = document.createElement('td');
-            nameCell.textContent = contestant.name;
-            const imageCell = document.createElement('td');
-            imageCell.style.backgroundImage = `url(${contestant.image})`;
-            imageCell.style.backgroundSize = 'cover';
-            const rolecell = document.createElement('td');
-            rolecell.textContent = contestant.role;
-            row.appendChild(nameCell);
-            row.appendChild(imageCell);
-            row.appendChild(rolecell);
-            for (let i = 0; i < contestant.placementTexts.length; i++) {
-                const statusCell = document.createElement('td');
-                statusCell.innerHTML = contestant.placementTexts[i] || '';
-                statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
-                if (contestant.placementColors[i] == 'black' || contestant.placementColors[i] == '#deb887') {
-                    statusCell.style.color = 'white';
-                } else {
-                    statusCell.style.color = 'black';
-                }
-                row.appendChild(statusCell);
-            }
-            table.appendChild(row);
+            createContestantRow(table, contestant);
         });
 
         deadCast.forEach(contestant => {
-            const row = document.createElement('tr');
-            const nameCell = document.createElement('td');
-            nameCell.textContent = contestant.name;
-            const imageCell = document.createElement('td');
-            imageCell.style.backgroundImage = `url(${contestant.image})`;
-            imageCell.style.backgroundSize = 'cover';
-            const rolecell = document.createElement('td');
-            rolecell.textContent = contestant.role;
-            row.appendChild(nameCell);
-            row.appendChild(imageCell);
-            row.appendChild(rolecell);
-            for (let i = 0; i < contestant.placementTexts.length; i++) {
-                const statusCell = document.createElement('td');
-                statusCell.innerHTML = contestant.placementTexts[i] || '';
-                statusCell.style.backgroundColor = contestant.placementColors[i] || 'black';
-                if (contestant.placementColors[i] == 'black' || contestant.placementColors[i] == '#deb887') {
-                    statusCell.style.color = 'white';
-                } else {
-                    statusCell.style.color = 'black';
-                }
-                row.appendChild(statusCell);
-            }
-            table.appendChild(row);
+            createContestantRow(table, contestant);
         });
 
         pairChallenge = false;
@@ -1334,11 +1369,83 @@ if (document.location.pathname.includes("index.html")) {
         ui.container.appendChild(center);
 
         ui.addButton('Download', downloadProgress);
+        ui.addButton('Voting Chart', votingHistoryChart);
         if (!seasonOver) {
             ui.addButton('Next Episode', newEpisode);
         } else {
             ui.addButton('Resimulate', resimulate);
         }
+    }
+
+    function votingHistoryChart() {
+        ui.wipe();
+        ui.addBoldParagraph('Voting History', 'voting-history-title');
+        ui.addRow();
+
+        const center = document.createElement('center');
+        const containerToCapture = document.createElement('div');
+
+        const table = document.createElement('table');
+        table.id = 'voting-history-container';
+
+        const headerRow = document.createElement('tr');
+        const nameHeader = document.createElement('th');
+        nameHeader.textContent = 'Contestant';
+        headerRow.appendChild(nameHeader);
+
+        for (let i = 1; i <= episodeNumber; i++) {
+            const episodeHeader = document.createElement('th');
+            episodeHeader.textContent = `Ep. ${i} `;
+            if (i === episodeNumber && seasonOver && finaleStretchLastEp) {
+                episodeHeader.colSpan = 2;
+            }
+            headerRow.appendChild(episodeHeader);
+        }
+
+        table.appendChild(headerRow);
+
+        currentCast.forEach(contestant => {
+            createVoteContestantRow(table, contestant);
+        });
+        deadCast.forEach(contestant => {
+            createVoteContestantRow(table, contestant);
+        });
+
+        containerToCapture.appendChild(table);
+        center.appendChild(containerToCapture);
+        ui.container.appendChild(center);
+
+        ui.addButton('Download', downloadVotingHistory);
+        ui.addButton('Back to Progress', contestantProgress);
+    }
+
+    function downloadVotingHistory() {
+        const input = document.getElementById('voting-history-container');
+
+        if (!input) {
+            console.error("Progress container element not found!");
+            alert("Cannot find the table to download. Please ensure the structure is correct.");
+            return;
+        }
+
+        html2canvas(input, {
+            scale: 2,
+            logging: false,
+            backgroundColor: '#000'
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+
+            link.download = `TrackRecord_Episode${episodeNumber}.png`;
+            link.href = imgData;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }).catch(err => {
+            console.error("Error generating image:", err);
+            alert("Failed to generate the image for download.");
+        });
     }
 
     function downloadProgress() {
