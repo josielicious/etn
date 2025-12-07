@@ -436,6 +436,8 @@ if (document.location.pathname.includes("index.html")) {
             contestant.placementColors = [];
 
             contestant.relationships = {};
+
+            contestant.votingHistory = {};
         });
 
         startSimulation();
