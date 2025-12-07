@@ -118,17 +118,45 @@ let captureChallenge = false;
 let burialHappened = false;
 let pairChallenge = false;
 
+let hiddenVotes = false;
+
+let episodeNumber = 0;
+
+let currentCast = [];
+let deadCast = [];
+
+let betrayalDeath = false;
+
+let doubleDeath = false;
+let doubleLive = false;
+
 // Cast Management //
 if (document.location.pathname.includes("index.html")) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleButton = document.getElementById('toggle-button');
+        const toggleContent = document.getElementById('toggle-content');
+
+        if (toggleButton && toggleContent) {
+            toggleButton.addEventListener('click', () => {
+                if (toggleContent.style.display === 'none') {
+                    toggleContent.style.display = 'block';
+                    toggleButton.textContent = 'Hide Simulation Settings';
+                } else {
+                    toggleContent.style.display = 'none';
+                    toggleButton.textContent = 'Show Simulation Settings';
+                }
+            });
+        }
+    });
+
     const castmatesList = document.getElementById('castmates-list');
     const castSizeDisplay = document.getElementById('cast-size');
     const searchInput = document.getElementById('search-castmate');
     const searchResultsDiv = document.getElementById('search-results');
     const randomCastmateButton = document.getElementById('random-castmate');
+    const randomCustomCastmateButton = document.getElementById('random-custom-castmate');
     const predefinedCastButton = document.getElementById('predefined-cast');
     const predefinedMenu = document.getElementById('predefined-menu');
-
-    let currentCast = [];
 
     const getPlaceholderImage = (name) => {
         const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -256,6 +284,22 @@ if (document.location.pathname.includes("index.html")) {
         addCastmate(availableContestants[randomIndex]);
     };
 
+    const addRandomCustomCastmate = () => {
+        if (currentCast.length >= customContestantInstances.length) return;
+
+        const availableContestants = customContestantInstances.filter(
+            c => !currentCast.some(cc => cc.name === c.name)
+        );
+
+        if (availableContestants.length === 0) {
+            console.warn('All available contestants have been added.');
+            return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * availableContestants.length);
+        addCastmate(availableContestants[randomIndex]);
+    };
+
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase().trim();
 
@@ -280,6 +324,7 @@ if (document.location.pathname.includes("index.html")) {
 
     predefinedCastButton.addEventListener('click', togglePredefinedMenu);
     randomCastmateButton.addEventListener('click', addRandomCastmate);
+    randomCustomCastmateButton.addEventListener('click', addRandomCustomCastmate);
 
     setupPredefinedMenu();
     renderCastmates();
@@ -289,16 +334,20 @@ if (document.location.pathname.includes("index.html")) {
     const simulationButton = document.getElementById('start-simulation');
     simulationButton.addEventListener('click', startSimulation);
 
-    let episodeNumber = 0;
-    let deadCast = [];
-
     function startSimulation() {
         if (currentCast.length <= 2) {
             alert('Please add at least 3 castmates to start the simulation.');
             return;
         }
 
+        checkAndApplyModifiers();
+
         startEntranceSequence();
+    }
+
+    function checkAndApplyModifiers() {
+        const hiddenVotesCheckbox = document.getElementById('hidden-votes-checkbox');
+        hiddenVotes = hiddenVotesCheckbox.checked;
     }
 
     // UI Class //
@@ -437,7 +486,7 @@ if (document.location.pathname.includes("index.html")) {
 
             contestant.relationships = {};
 
-            contestant.votingHistory = {};
+            contestant.votingHistory = [];
         });
 
         startSimulation();
@@ -936,9 +985,14 @@ if (document.location.pathname.includes("index.html")) {
                     contestant.vote = worstRelationshipPair(contestant, currentCast);
                     contestant.recordVote(episodeNumber, contestant.vote);
                     votePool.push(contestant.vote);
-                    ui.addImage(contestant.image, contestant.name);
-                    ui.addImage(contestant.vote.image, contestant.vote.image);
-                    ui.addParagraph(`${contestant.name} writes ${contestant.vote.name}'s name.`);
+                    if (hiddenVotes === false) {
+                        ui.addImage(contestant.image, contestant.name);
+                        ui.addImage(contestant.vote.image, contestant.vote.image);
+                        ui.addParagraph(`${contestant.name} writes ${contestant.vote.name}'s name.`);
+                    } else {
+                        ui.addImage(contestant.image, contestant.name);
+                        ui.addParagraph(`${contestant.name} writes a name...`);
+                    }
                 });
 
                 ui.addBoldParagraph(`The votes are in...`);
@@ -981,9 +1035,14 @@ if (document.location.pathname.includes("index.html")) {
                     contestant.vote = worstRelationshipPair(contestant, currentCast);
                     contestant.recordVote(episodeNumber, contestant.vote);
                     votePool.push(contestant.vote);
-                    ui.addImage(contestant.image, contestant.name);
-                    ui.addImage(contestant.vote.image, contestant.vote.image);
-                    ui.addParagraph(`${contestant.name} chooses ${contestant.vote.name}'s tarot card.`);
+                    if (hiddenVotes === false) {
+                        ui.addImage(contestant.image, contestant.name);
+                        ui.addImage(contestant.vote.image, contestant.vote.image);
+                        ui.addParagraph(`${contestant.name} chooses ${contestant.vote.name}'s tarot card.`);
+                    } else {
+                        ui.addImage(contestant.image, contestant.name);
+                        ui.addParagraph(`${contestant.name} chooses a tarot card...`);
+                    }
                 });
 
                 ui.addBoldParagraph(`The votes are in...`);
@@ -1069,11 +1128,6 @@ if (document.location.pathname.includes("index.html")) {
 
         ui.addButton('Proceed', contestantProgress);
     }
-
-    let betrayalDeath = false;
-
-    let doubleDeath = false;
-    let doubleLive = false;
 
     function finalDeathChallenge() {
         ui.wipe();
@@ -1419,6 +1473,11 @@ if (document.location.pathname.includes("index.html")) {
 
         ui.addButton('Download', downloadVotingHistory);
         ui.addButton('Back to Progress', contestantProgress);
+        if (!seasonOver) {
+            ui.addButton('Next Episode', newEpisode);
+        } else {
+            ui.addButton('Resimulate', resimulate);
+        }
     }
 
     function downloadVotingHistory() {

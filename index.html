@@ -33,6 +33,7 @@
             <div id="controls">
                 <input type="search" id="search-castmate" placeholder="Search for Contestants..." />
                 <button id="random-castmate">Add Random</button>
+                <button id="random-custom-castmate">Add Random Custom</button>
                 <button id="predefined-cast">Predefined Cast</button>
                 <div id="predefined-menu" class="dropdown-menu" style="display: none;">
                 </div>
@@ -44,6 +45,21 @@
             <b>Cast Size: <span id="cast-size">0</span></b>
             <div id="castmates-list">
                 <!-- Castmate cards will be rendered here -->
+            </div>
+            <div id="toggle-section-container">
+                <button id="toggle-button">Show Simulation Settings</button>
+                <div id="toggle-content" style="display: none;">
+                    <h3>Season Modifier Options</h3>
+                    <p>This will be gradually updated to contain more stuff.</p>
+                    <div class="modifier-option">
+                        <ul>
+                            <li><label for="hidden-votes-checkbox">
+                                    <input type="checkbox" id="hidden-votes-checkbox" name="hidden-votes">
+                                    Hidden Votes (Votes do not show)
+                                </label></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
         <button id="start-simulation" style="display: none;">Start Simulation</button>

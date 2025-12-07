@@ -254,3 +254,63 @@ a {
 p {
     padding: 0px 10px 0px 10px;
 }
+
+/* --- TOGGLE SECTION STYLES --- */
+
+#toggle-section-container {
+    margin: 20px 0;
+    padding: 10px;
+    border-radius: 15px;
+    /* Slightly less dark background for separation */
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+#toggle-button {
+    /* Use the existing button styles for consistency */
+    display: block;
+    /* Make the button take up its own line */
+    width: fit-content;
+    margin: 10px auto;
+    /* Center the button */
+}
+
+#toggle-content {
+    text-align: left;
+    padding: 15px 20px;
+    margin-top: 10px;
+    border-top: 1px solid rgba(190, 152, 113, 0.5);
+    /* Light gold separator */
+}
+
+#toggle-content h3 {
+    color: #be9871;
+    /* Gold color for heading */
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+#toggle-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#toggle-content li {
+    padding: 5px 0;
+    margin-left: 20px;
+    position: relative;
+}
+
+/* Custom bullet point using the gold color */
+#toggle-content li::before {
+    content: '★';
+    color: #be9871;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+/* Optional: Adjust simulation button margin */
+#start-simulation {
+    margin-top: 30px;
+}
